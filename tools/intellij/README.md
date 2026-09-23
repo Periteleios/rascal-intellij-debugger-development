@@ -34,13 +34,22 @@ mvn clean compile dependency:resolve
 ## 0. Syntax highlighting
 
 IntelliJ has no built-in Rascal support, so without this `.rsc` files render
-as plain, uncolored text. One-time setup:
+as plain, uncolored text. One-time setup -- no arguments needed, it
+auto-detects your IntelliJ profile (the most recently modified
+`IntelliJIdea*` directory under `~/.config/JetBrains` or
+`~/Library/Application Support/JetBrains`); pass one explicitly only if
+you have several installs and it picks the wrong one:
 
 ```bash
-tools/intellij/setup-intellij-rascal-highlighting.sh <path-to-your-intellij-profile>?
+tools/intellij/setup-intellij-rascal-highlighting.sh
+# or, explicitly:
+tools/intellij/setup-intellij-rascal-highlighting.sh /path/to/IntelliJIdea2026.2
 ```
 
-Restart IntelliJ, then verify: Settings > Editor > TextMate Bundles should
+If IntelliJ is currently running, the script warns and asks for
+confirmation before editing its settings files -- safest to close
+IntelliJ first, run the script, then reopen it. Restart IntelliJ, then
+verify: Settings > Editor > TextMate Bundles should
 list `rascal-basic` enabled. See
 [docs/intellij_rascal_highlighting.md](../../docs/intellij_rascal_highlighting.md)
 for what the script does and why the grammar needed patching.
