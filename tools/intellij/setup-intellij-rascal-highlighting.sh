@@ -21,7 +21,9 @@ set -euo pipefail
 #   tools/intellij/setup-intellij-rascal-highlighting.sh [path-to-IntelliJIdea-profile-dir]
 #
 # If no profile dir is given, the most recently modified "IntelliJIdea*"
-# profile under the JetBrains config root is used.
+# (Ultimate) or "IdeaIC*" (Community) profile under the JetBrains config
+# root is used -- the two editions use different directory-name prefixes
+# for the exact same kind of profile.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUNDLE_DIR="$SCRIPT_DIR/rascal-textmate-bundle"
@@ -54,9 +56,9 @@ else
   PROFILES=()
   while IFS= read -r -d '' dir; do
     PROFILES+=("$dir")
-  done < <(find -L "$JB_ROOT" -maxdepth 1 -iname "IntelliJIdea*" -type d -print0)
+  done < <(find -L "$JB_ROOT" -maxdepth 1 \( -iname "IntelliJIdea*" -o -iname "IdeaIC*" \) -type d -print0)
   if [ "${#PROFILES[@]}" -eq 0 ]; then
-    echo "error: no IntelliJIdea* profile found under $JB_ROOT" >&2
+    echo "error: no IntelliJIdea* (Ultimate) or IdeaIC* (Community) profile found under $JB_ROOT" >&2
     exit 1
   fi
   PROFILE_DIR="$(ls -dt "${PROFILES[@]}" | head -1)"

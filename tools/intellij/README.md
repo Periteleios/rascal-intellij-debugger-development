@@ -98,9 +98,10 @@ do any of them separately or by hand instead.
 IntelliJ has no built-in Rascal support, so without this `.rsc` files render
 as plain, uncolored text. One-time setup -- no arguments needed, it
 auto-detects your IntelliJ profile (the most recently modified
-`IntelliJIdea*` directory under `~/.config/JetBrains` or
-`~/Library/Application Support/JetBrains`); pass one explicitly only if
-you have several installs and it picks the wrong one:
+`IntelliJIdea*` (Ultimate) or `IdeaIC*` (Community) directory under
+`~/.config/JetBrains` or `~/Library/Application Support/JetBrains`); pass
+one explicitly only if you have several installs and it picks the wrong
+one:
 
 ```bash
 tools/intellij/setup-intellij-rascal-highlighting.sh
