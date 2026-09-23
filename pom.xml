@@ -5,11 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.periteleios</groupId>
-  <artifactId>rascal-intellij-debugger</artifactId>
+  <artifactId>rascal-intellij-debugger-development</artifactId>
   <version>0.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>rascal-intellij-debugger</name>
+  <name>rascal-intellij-debugger-development</name>
   <description>
     Standalone home for the Rascal Debugger IntelliJ plugin
     (tools/intellij/rascal-debugger-plugin/) and its supporting scripts,
