@@ -84,7 +84,7 @@ Whenever you change its source, you need to
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
 ./gradlew buildPlugin
 ```
 
@@ -96,7 +96,7 @@ Output: `build/distributions/rascal-debugger-<version>.zip` (version from
 **See the full list of available Gradle tasks**
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
 ./gradlew tasks
 ```
 
@@ -107,7 +107,7 @@ output first.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
 ./gradlew clean
 ```
 
@@ -124,7 +124,7 @@ actually ran, not just that a configuration happened to already exist.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
 ./gradlew runIde
 ```
 
@@ -134,7 +134,7 @@ a broken state. Separate from `clean`, which doesn't touch it.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
 ./gradlew cleanSandbox
 ```
 
@@ -145,7 +145,7 @@ release.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
 ./gradlew verifyPlugin
 ```
 
@@ -155,7 +155,7 @@ fields, target platform compatibility. Worth running after editing
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
 ./gradlew verifyPluginProjectConfiguration
 ```
 
@@ -164,7 +164,7 @@ if/when tests are added under `src/test/java/`.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
 ./gradlew test
 ```
 
