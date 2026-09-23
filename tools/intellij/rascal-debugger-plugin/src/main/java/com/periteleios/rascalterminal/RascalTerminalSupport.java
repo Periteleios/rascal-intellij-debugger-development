@@ -36,11 +36,8 @@ import java.util.Set;
  * (rascal/rascal-lsp/typepal plus everything any interpreted module might
  * touch via @javaClass, e.g. a project's own FFI glue needing org.json/
  * io.socket/Jetty) -- see {@link #computeDependencyClasspath(Path)}. This
- * used to shell out to a script the target project had to physically
- * contain at tools/intellij/compute-classpath.sh, which meant this only
- * ever worked on adept-base (or an identical clone); inlined here so any
- * Maven-based Rascal project works, with no dependency on this specific
- * project's own tooling.
+ * works for any Maven-based Rascal project, with no dependency on any
+ * specific project's own tooling.
  */
 final class RascalTerminalSupport {
 
@@ -54,8 +51,8 @@ final class RascalTerminalSupport {
             .createLocalShellWidget(project.getBasePath(), "Rascal: " + moduleName);
 
         // Classpath computation can shell out to `mvn` (several seconds on a
-        // cold/stale cache -- see compute-classpath.sh) -- keep it off the
-        // EDT along with everything else that follows.
+        // cold/stale cache) -- keep it off the EDT along with everything
+        // else that follows.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             String cp;
             try {
@@ -112,22 +109,16 @@ final class RascalTerminalSupport {
 
     /**
      * Computes (and caches) a Maven-based Rascal project's full resolved
-     * dependency classpath -- ported from what used to be a separate
-     * tools/intellij/compute-classpath.sh script (see that file's own
-     * comment, still used by run-rsc-lsp.sh, for the full history of why
-     * this needs to be one shared computation rather than separately
-     * hand-maintained jar lists: a fix for a missing-jar
-     * NoClassDefFoundError previously landed in one of two hardcoded
-     * copies and the bug kept happening via the other). Package-private
-     * for the same reason: also called directly by
-     * {@link RascalLanguageServerFactory}, which needs the identical
-     * classpath but launches the LSP server jar instead of a REPL.
+     * dependency classpath. Package-private so it can also be called
+     * directly by {@link RascalLanguageServerFactory}, which needs the
+     * identical classpath but launches the LSP server jar instead of a
+     * REPL -- keeping this as one shared computation avoids the earlier
+     * failure mode of two hand-maintained jar lists drifting apart (a fix
+     * for a missing-jar NoClassDefFoundError landing in one copy while the
+     * bug kept happening via the other).
      * <p>
      * Caching: reused from {@code <projectRoot>/target/rascal-ide-
-     * classpath.txt} as long as it's newer than pom.xml, the same cache
-     * file location compute-classpath.sh uses -- so on adept-base, a
-     * classpath already computed by that script (or by an LSP server
-     * launched via run-rsc-lsp.sh) is reused here rather than recomputed.
+     * classpath.txt} as long as it's newer than pom.xml.
      */
     static String computeDependencyClasspath(Path projectRoot) throws IOException, InterruptedException {
         Path pom = projectRoot.resolve("pom.xml");

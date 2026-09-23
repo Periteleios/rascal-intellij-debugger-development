@@ -30,10 +30,9 @@ import java.util.List;
  * inside any jar). So the grammar files ship as plain jar resources under
  * {@code rascal-textmate-bundle/} (see build.gradle.kts's default resource
  * handling) and get extracted once, on first call, to a real directory
- * under {@link PathManager#getSystemPath()} -- the same kind of one-time,
- * idempotent, cache-if-unchanged approach {@code compute-classpath.sh} and
- * {@code setup-intellij-rascal-highlighting.sh} already used, just done in
- * Java instead of requiring the user to run either by hand.
+ * under {@link PathManager#getSystemPath()} -- a one-time,
+ * idempotent, cache-if-unchanged copy, so nobody has to register the
+ * grammar with IntelliJ by hand.
  *
  * Keyed by plugin version (not a content hash or timestamp) so upgrading
  * the plugin automatically re-extracts into a fresh directory instead of

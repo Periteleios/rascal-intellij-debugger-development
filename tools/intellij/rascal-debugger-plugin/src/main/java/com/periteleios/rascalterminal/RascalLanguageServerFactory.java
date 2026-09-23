@@ -16,15 +16,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Launches Rascal's base LSP server (for editing {@code .rsc} files) without
- * needing tools/intellij/run-rsc-lsp.sh at all -- registered via LSP4IJ's
- * {@code com.redhat.devtools.lsp4ij.server} extension point (see plugin.xml),
- * the same "factory" pattern this plugin already uses for the DAP side
+ * Launches Rascal's base LSP server (for editing {@code .rsc} files),
+ * registered via LSP4IJ's {@code com.redhat.devtools.lsp4ij.server}
+ * extension point (see plugin.xml) -- the same "factory" pattern this
+ * plugin already uses for the DAP side
  * ({@link RascalDebugAdapterDescriptorFactory}).
  * <p>
  * The two system properties below are required, taken from how the official
- * VS Code Rascal extension launches the same jar (see run-rsc-lsp.sh's own
- * comment for the full story):
+ * VS Code Rascal extension launches the same jar:
  * <ol>
  *   <li>{@code -Drascal.lsp.deploy=true} switches BaseLanguageServer from its
  *   dev-mode TCP-socket-on-port-8888 path to stdio.</li>
@@ -36,7 +35,7 @@ import java.util.List;
  * The classpath is computed the exact same way "Run in new Rascal terminal"
  * already computes its own -- see {@link RascalTerminalSupport#computeClasspath}
  * -- so this server always matches whatever project is actually open in
- * IntelliJ, with no {@code RASCAL_PROJECT_ROOT}-style override needed.
+ * IntelliJ.
  */
 public final class RascalLanguageServerFactory implements LanguageServerFactory {
 
