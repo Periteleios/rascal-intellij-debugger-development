@@ -247,11 +247,12 @@ Files/Finder) for a `RascalTerminalSupport`/`RascalDebugPortFinder`/
 
 ###### Building/updating the plugin jar
 
-`rascal-debugger-plugin/` is a Gradle IntelliJ Platform plugin project.
-Whenever you change its source, rebuild the zip and reinstall it in
-IntelliJ (Settings > Plugins > gear icon > Install Plugin from Disk...,
-then restart when prompted) to pick up the change -- IntelliJ does not
-hot-reload plugins from disk.
+`rascal-debugger-plugin/` is a Gradle IntelliJ Platform plugin project.<br>
+IntelliJ does not hot-reload plugins from disk.<br>
+Whenever you change its source, you need to 
+* rebuild the zip 
+* reinstall it in IntelliJ 
+  - Settings > Plugins > gear icon > Install Plugin from Disk..., then restart when prompted.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
@@ -264,17 +265,12 @@ Output: `build/distributions/rascal-debugger-<version>.zip` (version from
 
 ###### Other Gradle tasks worth knowing
 
-These come from the IntelliJ Platform Gradle plugin itself
-(`org.jetbrains.intellij.platform`, applied in `build.gradle.kts`) -- run
-`./gradlew tasks` (from `tools/intellij/rascal-debugger-plugin/`) for the
-full list; this is just the subset actually useful day to day. Each block
-below is self-contained (its own `cd` and `JAVA_HOME`, same as the
-`buildPlugin` example above) so it also works standalone if you run it by
-clicking IntelliJ's inline "run" icon directly on it -- unlike a bare
-`./gradlew clean`, which fails with "Directory ... does not contain a
-build" if run from the repo root instead of from
-`rascal-debugger-plugin/`, or "Gradle requires JVM 17 or later" if
-`JAVA_HOME` isn't set:
+**See the full list of available Gradle tasks**
+```bash
+cd tools/intellij/rascal-debugger-plugin
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+./gradlew tasks
+```
 
 **Clean build output** -- deletes `build/` entirely: the compiled classes,
 the instrumented bytecode, and the zip from `buildPlugin`. Use this if a
