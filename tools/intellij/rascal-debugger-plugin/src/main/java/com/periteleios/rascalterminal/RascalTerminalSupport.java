@@ -103,7 +103,8 @@ final class RascalTerminalSupport {
         });
     }
 
-    private static String computeClasspath(Project project) throws IOException, InterruptedException {
+    /** Package-private: also called by {@link RascalLanguageServerFactory}. */
+    static String computeClasspath(Project project) throws IOException, InterruptedException {
         Path projectRoot = Path.of(project.getBasePath());
         String projectClasses = projectRoot.resolve("target").resolve("classes").toString();
         return computeDependencyClasspath(projectRoot) + java.io.File.pathSeparator + projectClasses;
@@ -117,7 +118,10 @@ final class RascalTerminalSupport {
      * this needs to be one shared computation rather than separately
      * hand-maintained jar lists: a fix for a missing-jar
      * NoClassDefFoundError previously landed in one of two hardcoded
-     * copies and the bug kept happening via the other).
+     * copies and the bug kept happening via the other). Package-private
+     * for the same reason: also called directly by
+     * {@link RascalLanguageServerFactory}, which needs the identical
+     * classpath but launches the LSP server jar instead of a REPL.
      * <p>
      * Caching: reused from {@code <projectRoot>/target/rascal-ide-
      * classpath.txt} as long as it's newer than pom.xml, the same cache
@@ -125,7 +129,7 @@ final class RascalTerminalSupport {
      * classpath already computed by that script (or by an LSP server
      * launched via run-rsc-lsp.sh) is reused here rather than recomputed.
      */
-    private static String computeDependencyClasspath(Path projectRoot) throws IOException, InterruptedException {
+    static String computeDependencyClasspath(Path projectRoot) throws IOException, InterruptedException {
         Path pom = projectRoot.resolve("pom.xml");
         if (!Files.isRegularFile(pom)) {
             throw new IOException("no pom.xml found at " + pom

@@ -10,12 +10,13 @@ plugins {
 }
 
 group = "com.periteleios"
-version = "0.6.0"
+version = "0.1.0"
 
 dependencies {
     intellijPlatform {
         intellijIdea("2026.2.2")
         bundledPlugin("org.jetbrains.plugins.terminal")
+        bundledPlugin("org.jetbrains.plugins.textmate")
         plugin("com.redhat.devtools.lsp4ij", "0.21.0")
     }
 }

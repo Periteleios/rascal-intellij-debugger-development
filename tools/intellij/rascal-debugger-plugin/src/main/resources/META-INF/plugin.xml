@@ -5,6 +5,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.terminal</depends>
+    <depends>org.jetbrains.plugins.textmate</depends>
     <depends>com.redhat.devtools.lsp4ij</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -31,6 +32,22 @@
           RascalLocationLinkFilter's own javadoc for the full story.
         -->
         <consoleFilterProvider implementation="com.periteleios.rascalterminal.RascalLocationLinkFilterProvider"/>
+        <!--
+          Registers the Rascal TextMate grammar automatically, so nobody
+          has to run setup-intellij-rascal-highlighting.sh by hand. See
+          RascalTextMateBundleProvider's own javadoc for why the grammar
+          has to be extracted to a real directory rather than served
+          straight out of this jar's own resources.
+        -->
+        <textmate.bundleProvider implementation="com.periteleios.rascalterminal.RascalTextMateBundleProvider"/>
+        <!--
+          Auto-creates the "Rascal Attach" DAP Run/Debug configuration (see
+          debugAdapterServer below) on project open, including the
+          Mappings-tab entry that's easy to miss by hand, whose absence
+          causes a completely silent breakpoint failure. See
+          RascalProjectActivity's own javadoc for the full story.
+        -->
+        <postStartupActivity implementation="com.periteleios.rascalterminal.RascalProjectActivity"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
@@ -52,6 +69,19 @@
         <debugAdapterServer id="rascal"
                              name="Rascal Debugger"
                              factoryClass="com.periteleios.rascalterminal.RascalDebugAdapterDescriptorFactory"/>
+        <!--
+          Registers the .rsc Language Server automatically, so nobody has
+          to manually add it via Settings > Languages & Frameworks >
+          Language Servers, and no RASCAL_PROJECT_ROOT env var is needed,
+          since
+          RascalLanguageServerFactory always resolves the classpath from
+          whichever project is actually open (same as "Run in new Rascal
+          terminal" already does). See its own javadoc for the full story.
+        -->
+        <server id="rascal-lsp"
+                name="Rascal Language Server"
+                factoryClass="com.periteleios.rascalterminal.RascalLanguageServerFactory"/>
+        <fileNamePatternMapping serverId="rascal-lsp" patterns="*.rsc" languageId="rascal"/>
     </extensions>
 
     <actions>

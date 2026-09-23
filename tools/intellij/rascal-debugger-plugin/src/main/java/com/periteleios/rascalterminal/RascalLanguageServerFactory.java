@@ -1,0 +1,67 @@
+/*
+ * Copyright (c) 2026, Periteleios
+ * All rights reserved. This file is licensed under the BSD 2-Clause
+ * License -- see the LICENSE file in this directory.
+ */
+package com.periteleios.rascalterminal;
+
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import com.redhat.devtools.lsp4ij.LanguageServerFactory;
+import com.redhat.devtools.lsp4ij.server.OSProcessStreamConnectionProvider;
+import com.redhat.devtools.lsp4ij.server.StreamConnectionProvider;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+
+/**
+ * Launches Rascal's base LSP server (for editing {@code .rsc} files) without
+ * needing tools/intellij/run-rsc-lsp.sh at all -- registered via LSP4IJ's
+ * {@code com.redhat.devtools.lsp4ij.server} extension point (see plugin.xml),
+ * the same "factory" pattern this plugin already uses for the DAP side
+ * ({@link RascalDebugAdapterDescriptorFactory}).
+ * <p>
+ * The two system properties below are required, taken from how the official
+ * VS Code Rascal extension launches the same jar (see run-rsc-lsp.sh's own
+ * comment for the full story):
+ * <ol>
+ *   <li>{@code -Drascal.lsp.deploy=true} switches BaseLanguageServer from its
+ *   dev-mode TCP-socket-on-port-8888 path to stdio.</li>
+ *   <li>{@code -Drascal.fallbackResolver=...FallbackResolver} tells the
+ *   server which class to construct as its FallbackResolver singleton --
+ *   without it the server crashes on any request with "FallbackResolver
+ *   accessed before initialization".</li>
+ * </ol>
+ * The classpath is computed the exact same way "Run in new Rascal terminal"
+ * already computes its own -- see {@link RascalTerminalSupport#computeClasspath}
+ * -- so this server always matches whatever project is actually open in
+ * IntelliJ, with no {@code RASCAL_PROJECT_ROOT}-style override needed.
+ */
+public final class RascalLanguageServerFactory implements LanguageServerFactory {
+
+    private static final Logger LOG = Logger.getInstance(RascalLanguageServerFactory.class);
+
+    @Override
+    public @NotNull StreamConnectionProvider createConnectionProvider(@NotNull Project project) {
+        String classpath;
+        try {
+            classpath = RascalTerminalSupport.computeClasspath(project);
+        } catch (Exception e) {
+            LOG.warn("Failed to compute Rascal classpath for the language server", e);
+            throw new RuntimeException("Failed to compute Rascal classpath: " + e.getMessage(), e);
+        }
+
+        GeneralCommandLine commandLine = new GeneralCommandLine(List.of(
+            "java",
+            "-Drascal.lsp.deploy=true",
+            "-Drascal.fallbackResolver=org.rascalmpl.vscode.lsp.uri.FallbackResolver",
+            "-cp", classpath,
+            "org.rascalmpl.vscode.lsp.rascal.RascalLanguageServer"
+        ));
+        if (project.getBasePath() != null) {
+            commandLine.setWorkDirectory(project.getBasePath());
+        }
+        return new OSProcessStreamConnectionProvider(commandLine);
+    }
+}
