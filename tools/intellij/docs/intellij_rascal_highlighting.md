@@ -11,7 +11,7 @@ tools/intellij/setup-intellij-rascal-highlighting.sh
 
 Run it once per machine, then restart IntelliJ. It edits your local
 IntelliJ settings (not tracked in git) to register the bundle in
-`intellij-rascal-syntax-highlighting/` and makes sure nothing else (a stray
+`rascal-textmate-bundle/` and makes sure nothing else (a stray
 "Plain Text" mapping, an old custom file type) is claiming the `.rsc`
 extension instead.
 
@@ -29,7 +29,7 @@ owned by that bundle rather than Plain Text.
 
 ## Why the grammar is patched
 
-`intellij-rascal-syntax-highlighting/` is derived from
+`rascal-textmate-bundle/` is derived from
 [thron7/vsc-rascal](https://github.com/thron7/vsc-rascal)'s TextMate
 grammar, with fixes applied directly to `syntaxes/rascal.tmLanguage.json`:
 
@@ -71,7 +71,7 @@ left in place rather than removed — they're dead weight since Rascal code
 never triggers them, but harmless.
 
 If you need to patch the grammar further, edit
-`intellij-rascal-syntax-highlighting/syntaxes/rascal.tmLanguage.json` directly
+`rascal-textmate-bundle/syntaxes/rascal.tmLanguage.json` directly
 and restart IntelliJ (or reopen the file) to see the change — no need to
 re-run the setup script unless you're changing *which* directory is
 registered as the bundle.

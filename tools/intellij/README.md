@@ -136,7 +136,7 @@ the same way, under their own
 [LICENSE](LICENSE) file one level up -- so any other project or company
 can use, modify, or redistribute any of this freely. This is separate
 from the syntax-highlighting bundle in part 0
-(`intellij-rascal-syntax-highlighting/`), which is a derivative of a
+(`rascal-textmate-bundle/`), which is a derivative of a
 third-party project and not covered by either license (see that
 project's own README for its provenance).
 
