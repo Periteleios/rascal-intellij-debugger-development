@@ -274,14 +274,55 @@ it by clicking IntelliJ's inline "run" icon directly on one of these lines
 not contain a build" if run standalone from the repo root instead of from
 `rascal-debugger-plugin/`:
 
-| Command | What it does |
-|---|---|
-| `cd tools/intellij/rascal-debugger-plugin && ./gradlew clean` | Deletes `build/` entirely -- the compiled classes, the instrumented bytecode, and the zip from `buildPlugin`. Use this if a stale build is ever in doubt; `buildPlugin` alone does not wipe prior output first. |
-| `cd tools/intellij/rascal-debugger-plugin && ./gradlew runIde` | Launches a disposable sandbox IntelliJ instance with this plugin pre-installed -- the fast loop for iterating without reinstalling into your real IDE each time (see "Building/updating the plugin jar" above for why a real install still needs a rebuild + "Install Plugin from Disk"). |
-| `cd tools/intellij/rascal-debugger-plugin && ./gradlew cleanSandbox` | Wipes that sandbox instance's own state (its config/plugins/system dirs under `.intellijPlatform/sandbox/`) if `runIde` ever gets into a broken state -- separate from `clean`, which doesn't touch it. |
-| `cd tools/intellij/rascal-debugger-plugin && ./gradlew verifyPlugin` | Runs the IntelliJ Plugin Verifier against the `sinceBuild`/`untilBuild` range declared in `build.gradle.kts` -- catches "this won't load on IDE version X" problems before shipping a release. |
-| `cd tools/intellij/rascal-debugger-plugin && ./gradlew verifyPluginProjectConfiguration` | Sanity-checks the Gradle project setup itself (JDK version, `plugin.xml` fields, target platform compatibility) -- worth running after editing `build.gradle.kts`. |
-| `cd tools/intellij/rascal-debugger-plugin && ./gradlew test` | Runs the unit test suite. None exist yet -- this is the task to wire up if/when tests are added under `src/test/java/`. |
+**Clean build output** -- deletes `build/` entirely: the compiled classes,
+the instrumented bytecode, and the zip from `buildPlugin`. Use this if a
+stale build is ever in doubt; `buildPlugin` alone does not wipe prior
+output first.
+
+```bash
+cd tools/intellij/rascal-debugger-plugin && ./gradlew clean
+```
+
+**Launch a sandbox IDE with the plugin pre-installed** -- a disposable
+IntelliJ instance, the fast loop for iterating without reinstalling into
+your real IDE each time (see "Building/updating the plugin jar" above for
+why a real install still needs a rebuild + "Install Plugin from Disk").
+
+```bash
+cd tools/intellij/rascal-debugger-plugin && ./gradlew runIde
+```
+
+**Reset that sandbox instance** -- wipes its own state (config/plugins/
+system dirs under `.intellijPlatform/sandbox/`) if `runIde` ever gets into
+a broken state. Separate from `clean`, which doesn't touch it.
+
+```bash
+cd tools/intellij/rascal-debugger-plugin && ./gradlew cleanSandbox
+```
+
+**Verify IDE-version compatibility** -- runs the IntelliJ Plugin Verifier
+against the `sinceBuild`/`untilBuild` range declared in `build.gradle.kts`.
+Catches "this won't load on IDE version X" problems before shipping a
+release.
+
+```bash
+cd tools/intellij/rascal-debugger-plugin && ./gradlew verifyPlugin
+```
+
+**Sanity-check the Gradle project setup** -- JDK version, `plugin.xml`
+fields, target platform compatibility. Worth running after editing
+`build.gradle.kts`.
+
+```bash
+cd tools/intellij/rascal-debugger-plugin && ./gradlew verifyPluginProjectConfiguration
+```
+
+**Run the unit test suite** -- none exist yet; this is the task to wire up
+if/when tests are added under `src/test/java/`.
+
+```bash
+cd tools/intellij/rascal-debugger-plugin && ./gradlew test
+```
 
 To ship a new version to the rest of the team (rather than just testing
 locally), see the release steps in
