@@ -19,6 +19,18 @@
           has nothing registered for "std" until this extension point does.
         -->
         <virtualFileSystem implementationClass="com.periteleios.rascalterminal.StdFileSystem" key="std" physical="true"/>
+        <!--
+          Makes Rascal's own |uri|(offset,length,<line,col>,<line,col>)
+          location literals, printed for compile errors and stack traces in
+          a "Run in new Rascal terminal" session, clickable: jumping to the
+          right file and line/column. Reuses the same extension point the
+          bundled Terminal plugin's own generic file-link detector uses
+          (org.jetbrains.plugins.terminal.hyperlinks.filter
+          .TerminalGenericFileFilterProvider), which otherwise misreads this
+          syntax and shows "Cannot find file" instead of navigating. See
+          RascalLocationLinkFilter's own javadoc for the full story.
+        -->
+        <consoleFilterProvider implementation="com.periteleios.rascalterminal.RascalLocationLinkFilterProvider"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
