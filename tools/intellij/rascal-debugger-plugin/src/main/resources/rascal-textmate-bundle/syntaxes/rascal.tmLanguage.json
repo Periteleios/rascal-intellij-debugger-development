@@ -100,10 +100,10 @@
       "include": "#comments-javadoc"
     },
     {
-      "include": "#code"
+      "include": "#module"
     },
     {
-      "include": "#module"
+      "include": "#code"
     }
   ],
   "repository": {
@@ -1151,20 +1151,7 @@
       "name": "meta.module.rascal",
       "patterns": [
         {
-          "begin": "{",
-          "beginCaptures": {
-            "0": {
-              "name": "punctuation.section.module.begin.bracket.curly.rascal"
-            }
-          },
-          "end": "(?=})",
-          "contentName": "meta.module.body.rascal",
-          "patterns": [
-            {
-              "match": "\\b(requires|transitive|exports|opens|to|uses|provides|with)\\b",
-              "name": "keyword.module.rascal"
-            }
-          ]
+          "include": "#code"
         }
       ]
     },
