@@ -11,7 +11,7 @@ all three, done in order, before things actually work:
    [LSP4IJ](https://plugins.jetbrains.com/plugin/23257-lsp4ij) plugin and the
    `run-rsc-lsp.sh` launcher script.
 2. **Debugging** (breakpoints, stepping, variable inspection) -- via
-   `rascal-terminal-plugin/` (published as **Rascal Debugger** in its own
+   `rascal-debugger-plugin/` (published as **Rascal Debugger** in its own
    [public releases repo](https://github.com/Periteleios/intellij-plugin-rascal-debug)),
    plus an LSP4IJ DAP ("Debug Adapter Protocol") run configuration.
 
@@ -95,7 +95,7 @@ team will actually point it at. A copy of these scripts living anywhere
 else will use whatever it's pointed at instead of computing a location
 from their own. This is how they're mirrored, still fully functional,
 into the
-[public rascal-terminal-plugin releases repo](https://github.com/Periteleios/intellij-plugin-rascal-debug)
+[public rascal-debugger-plugin releases repo](https://github.com/Periteleios/intellij-plugin-rascal-debug)
 alongside the syntax-highlighting bundle -- see that repo's own README.
 There's no way around needing an actual Maven-built Rascal project
 checkout somewhere on disk (the language server's own compiled
@@ -104,7 +104,7 @@ but the scripts no longer have to physically live inside it.
 
 "Go to Definition" into standard library symbols (`IO::println`,
 `List::size`, `Set`, `String`, `util::FileSystem`, etc.) needs
-`rascal-terminal-plugin` **0.2.0+** (see part 2 below) -- Rascal's compiled
+`rascal-debugger-plugin` **0.2.0+** (see part 2 below) -- Rascal's compiled
 stdlib bakes `std:///`-scheme locations into its definitions, which LSP4IJ
 has no built-in way to resolve; the plugin registers a `VirtualFileSystem`
 that bridges it. Without that plugin (or on an older version), clicking
@@ -117,7 +117,7 @@ each script to match.
 
 ---
 
-## 2. Debugging: `rascal-terminal-plugin` + LSP4IJ DAP config
+## 2. Debugging: `rascal-debugger-plugin` + LSP4IJ DAP config
 
 Unlike parts 0 and 1, nothing here is specific to this checkout: the
 "Import"/"Run in new Rascal terminal" CodeLenses compute their classpath
@@ -127,16 +127,16 @@ hardcoded to `adept-base`. The DAP breakpoint-handling fix and the
 `std:///` stdlib bridge were already fully generic. So this whole plugin
 works against any Maven-based Rascal project, this one included.
 
-`rascal-terminal-plugin/`'s own source (every Java file, plus
+`rascal-debugger-plugin/`'s own source (every Java file, plus
 `build.gradle.kts`/`settings.gradle.kts`) is licensed under BSD 2-Clause
--- see its [LICENSE](rascal-terminal-plugin/LICENSE) file. The four
+-- see its [LICENSE](rascal-debugger-plugin/LICENSE) file. The four
 scripts directly in this directory (`setup-intellij-rascal-
 highlighting.sh`, `run-rsc-lsp.sh`, `compute-classpath.sh`) are covered
 the same way, under their own
 [LICENSE](LICENSE) file one level up -- so any other project or company
 can use, modify, or redistribute any of this freely. This is separate
 from the syntax-highlighting bundle in part 0
-(`intellij-rascal-bundle/`), which is a derivative of a
+(`intellij-rascal-syntax-highlighting/`), which is a derivative of a
 third-party project and not covered by either license (see that
 project's own README for its provenance).
 
@@ -156,7 +156,7 @@ the usual JetBrains vendor listing). Install it, restart when prompted.
 Future releases show up as normal plugin updates from then on -- no manual
 reinstalling.
 
-(This repo -- and the plugin's actual source in `rascal-terminal-plugin/`
+(This repo -- and the plugin's actual source in `rascal-debugger-plugin/`
 -- is public too now, but releases are still hosted separately, in that
 dedicated repo, since IntelliJ's plugin-repository feature needs a
 static `updatePlugins.xml` + release assets to auto-update from, not a
@@ -230,14 +230,14 @@ Files/Finder) for a `RascalTerminalSupport`/`RascalDebugPortFinder`/
 
 ###### Building/updating the plugin jar
 
-`rascal-terminal-plugin/` is a Gradle IntelliJ Platform plugin project.
+`rascal-debugger-plugin/` is a Gradle IntelliJ Platform plugin project.
 Whenever you change its source, rebuild the zip and reinstall it in
 IntelliJ (Settings > Plugins > gear icon > Install Plugin from Disk...,
 then restart when prompted) to pick up the change -- IntelliJ does not
 hot-reload plugins from disk.
 
 ```bash
-cd tools/intellij/rascal-terminal-plugin
+cd tools/intellij/rascal-debugger-plugin
 export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
 ./gradlew buildPlugin
 ```
@@ -262,7 +262,7 @@ Notes:
   plugin pre-installed, useful for iterating without reinstalling into your
   real IDE each time.
 - `.intellijPlatform/`, `.gradle/`, `.idea/`, and `build/` under
-  `rascal-terminal-plugin/` are all gitignored -- if `git status` ever shows
+  `rascal-debugger-plugin/` are all gitignored -- if `git status` ever shows
   changes under any of those, you likely ran a build command from the wrong
   directory; don't commit them (one of them is a multi-MB local sandbox
   cache).

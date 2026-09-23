@@ -1,7 +1,7 @@
 # rascal-intellij-debugger
 
 Standalone home for the **Rascal Debugger** IntelliJ plugin
-(`tools/intellij/rascal-terminal-plugin/`) and its supporting scripts
+(`tools/intellij/rascal-debugger-plugin/`) and its supporting scripts
 (`tools/intellij/`), plus a minimal Maven-based Rascal project
 (`src/main/rascal/`) to develop and test them against.
 
@@ -13,13 +13,13 @@ public home for it instead.
 
 ## What's here
 
-- `tools/intellij/rascal-terminal-plugin/` -- the actual IntelliJ plugin
+- `tools/intellij/rascal-debugger-plugin/` -- the actual IntelliJ plugin
   source (Java + Gradle). BSD 2-Clause licensed, see its own `LICENSE`.
 - `tools/intellij/{run-rsc-lsp.sh,compute-classpath.sh,
   setup-intellij-rascal-highlighting.sh}` -- the supporting scripts (LSP
   language server + syntax highlighting setup). BSD 2-Clause licensed,
   see `tools/intellij/LICENSE`.
-- `tools/intellij/intellij-rascal-bundle/` + `tools/intellij/docs/intellij_rascal_highlighting.md`
+- `tools/intellij/intellij-rascal-syntax-highlighting/` + `tools/intellij/docs/intellij_rascal_highlighting.md`
   -- the TextMate syntax-highlighting grammar. This one is a derivative of
   a separate third-party project (`thron7/vsc-rascal`, itself unlicensed
   upstream) and is **not** covered by the BSD 2-Clause license above --

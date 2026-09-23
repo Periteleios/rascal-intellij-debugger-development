@@ -27,8 +27,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 This covers the scripts directly in this directory
 (setup-intellij-rascal-highlighting.sh, run-rsc-lsp.sh,
-compute-classpath.sh). rascal-terminal-plugin/ has its own LICENSE file
-(same terms). intellij-rascal-bundle/ (the syntax-highlighting grammar)
+compute-classpath.sh). rascal-debugger-plugin/ has its own LICENSE file
+(same terms). intellij-rascal-syntax-highlighting/ (the syntax-highlighting grammar)
 is a derivative of a separate third-party project and is not covered by
 this license -- see docs/intellij_rascal_highlighting.md for its
 provenance.

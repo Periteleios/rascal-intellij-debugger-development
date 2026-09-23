@@ -26,7 +26,7 @@
 # The classpath comes from compute-classpath.sh -- this project's full
 # Maven-resolved dependency list, cached under target/. This whole JVM
 # process also hosts every "Run in new Rascal terminal" REPL
-# (rascal-terminal-plugin drives it through this same server), so it needs
+# (rascal-debugger-plugin drives it through this same server), so it needs
 # not just rascal/rascal-lsp/typepal but everything any interpreted module
 # might touch via @javaClass. Hardcoding that list by hand here (and
 # separately in the plugin's RascalTerminalSupport.java) is exactly how
@@ -36,7 +36,7 @@
 #
 # This script itself is portable -- it can be run from a location other
 # than tools/intellij/ inside this checkout (e.g. hosted alongside the
-# rascal-terminal-plugin's own public releases repo) by setting
+# rascal-debugger-plugin's own public releases repo) by setting
 # ADEPT_BASE_ROOT (in this Language Server's "Environment variables" field
 # in IntelliJ, not the Command field) to an absolute path to an actual
 # adept-base checkout. There's no way around needing one somewhere on

@@ -1,8 +1,8 @@
 target/
 .idea/
 
-# rascal-terminal-plugin (Gradle IntelliJ plugin project) build artifacts
-tools/intellij/rascal-terminal-plugin/build/
-tools/intellij/rascal-terminal-plugin/.gradle/
-tools/intellij/rascal-terminal-plugin/.idea/
-tools/intellij/rascal-terminal-plugin/.intellijPlatform/
+# rascal-debugger-plugin (Gradle IntelliJ plugin project) build artifacts
+tools/intellij/rascal-debugger-plugin/build/
+tools/intellij/rascal-debugger-plugin/.gradle/
+tools/intellij/rascal-debugger-plugin/.idea/
+tools/intellij/rascal-debugger-plugin/.intellijPlatform/

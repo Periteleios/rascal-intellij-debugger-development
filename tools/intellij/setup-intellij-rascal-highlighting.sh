@@ -8,7 +8,7 @@ set -euo pipefail
 # SUMMARY:
 # Wires up IntelliJ IDEA's TextMate Bundles + File Types so that *.rsc
 # (Rascal) source files get real syntax highlighting. IntelliJ has no
-# built-in Rascal support, and the grammar in ./intellij-rascal-bundle/
+# built-in Rascal support, and the grammar in ./intellij-rascal-syntax-highlighting/
 # has been patched (relative to its thron7/vsc-rascal upstream) to cover
 # Rascal's actual keyword set and to stop doc-comment prose from being
 # re-tokenized as code -- see docs/intellij_rascal_highlighting.md.
@@ -24,7 +24,7 @@ set -euo pipefail
 # profile under the JetBrains config root is used.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BUNDLE_DIR="$SCRIPT_DIR/intellij-rascal-bundle"
+BUNDLE_DIR="$SCRIPT_DIR/intellij-rascal-syntax-highlighting"
 
 if [ ! -f "$BUNDLE_DIR/syntaxes/rascal.tmLanguage.json" ]; then
   echo "error: bundle files not found at $BUNDLE_DIR" >&2
