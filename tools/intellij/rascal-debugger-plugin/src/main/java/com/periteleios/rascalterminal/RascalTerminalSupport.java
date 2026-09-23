@@ -9,6 +9,7 @@ import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.execution.configurations.PathEnvironmentVariableUtil;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.EnvironmentUtil;
@@ -16,6 +17,7 @@ import org.jetbrains.plugins.terminal.ShellTerminalWidget;
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 
 import java.awt.datatransfer.StringSelection;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -136,22 +138,32 @@ final class RascalTerminalSupport {
         }
 
         Files.createDirectories(target);
-        ProcessBuilder builder = new ProcessBuilder(
-            "mvn", "-q", "-f", pom.toString(),
-            "dependency:build-classpath",
-            "-Dmdep.outputFile=" + cacheFile
-        ).redirectErrorStream(true);
         // A GUI-launched IDE process (as opposed to one started from a
         // terminal) inherits a minimal PATH on macOS -- typically missing
         // wherever Homebrew/SDKMAN put `mvn` -- so "mvn" resolves fine for
         // "Run in new Rascal terminal" (a real login shell) but can fail
-        // here. EnvironmentUtil.getEnvironmentMap() runs the user's actual
-        // login shell once and caches its resulting environment (PATH
-        // included) -- IntelliJ's own established fix for exactly this
-        // class of problem. Prompted by a Mac user hitting
-        // CannotStartServerException ("rascal-lsp", pid=null) -- consistent
-        // with this process never starting at all -- though not fully
-        // root-caused against a "Caused by:" trace before this landed.
+        // here. Confirmed live via a full "Caused by:" chain down to a raw
+        // ENOENT from forkAndExec: merely setting the child's environment
+        // (builder.environment().putAll(...)) does NOT fix this by itself
+        // -- resolving a bare command name happens against the *launching*
+        // process's own environment, not whatever you hand the child, so
+        // "mvn" still isn't found even once the child's PATH is correct.
+        // PathEnvironmentVariableUtil.findInPath pre-resolves the absolute
+        // path instead, sidestepping that lookup entirely -- and (per its
+        // own bytecode) already searches using EnvironmentUtil's corrected
+        // PATH, not the JVM's raw launch-time one, so no separate PATH
+        // string needs threading through here.
+        File mvnExecutable = PathEnvironmentVariableUtil.findInPath("mvn");
+        String mvnCommand = mvnExecutable != null ? mvnExecutable.getAbsolutePath() : "mvn";
+        ProcessBuilder builder = new ProcessBuilder(
+            mvnCommand, "-q", "-f", pom.toString(),
+            "dependency:build-classpath",
+            "-Dmdep.outputFile=" + cacheFile
+        ).redirectErrorStream(true);
+        // Still worth keeping: the resolved mvn binary itself may depend on
+        // other PATH entries (e.g. a JAVA_HOME-relative java) or other env
+        // vars sourced from the login shell, which a bare fork+exec of an
+        // absolute path won't otherwise inherit from a GUI-launched IDE.
         builder.environment().putAll(EnvironmentUtil.getEnvironmentMap());
         Process process = builder.start();
 
