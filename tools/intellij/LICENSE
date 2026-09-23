@@ -26,7 +26,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
 This covers the scripts directly in this directory
-(setup-intellij-rascal-highlighting.sh, run-rsc-lsp.sh, run-ptl-lsp.sh,
+(setup-intellij-rascal-highlighting.sh, run-rsc-lsp.sh,
 compute-classpath.sh). rascal-terminal-plugin/ has its own LICENSE file
 (same terms). scripts/intellij-rascal-bundle/ (the syntax-highlighting
 grammar, referenced but not contained here) is a derivative of a separate

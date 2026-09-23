@@ -15,9 +15,9 @@ public home for it instead.
 
 - `tools/intellij/rascal-terminal-plugin/` -- the actual IntelliJ plugin
   source (Java + Gradle). BSD 2-Clause licensed, see its own `LICENSE`.
-- `tools/intellij/{run-rsc-lsp.sh,run-ptl-lsp.sh,compute-classpath.sh,
+- `tools/intellij/{run-rsc-lsp.sh,compute-classpath.sh,
   setup-intellij-rascal-highlighting.sh}` -- the supporting scripts (LSP
-  language servers + syntax highlighting setup). BSD 2-Clause licensed,
+  language server + syntax highlighting setup). BSD 2-Clause licensed,
   see `tools/intellij/LICENSE`.
 - `scripts/intellij-rascal-bundle/` + `docs/intellij_rascal_highlighting.md`
   -- the TextMate syntax-highlighting grammar. This one is a derivative of

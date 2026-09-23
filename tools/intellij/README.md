@@ -1,15 +1,15 @@
 # IntelliJ setup for Rascal (highlighting + editing + debugging)
 
-This directory makes Rascal (`.rsc`) and PTL (`.ptl`) files readable and
-editable in IntelliJ IDEA. None of this is automatic and none of it is
-bundled into any single install -- there are three independent pieces,
-and you need all three, done in order, before things actually work:
+This directory makes Rascal (`.rsc`) files readable and editable in
+IntelliJ IDEA. None of this is automatic and none of it is bundled into
+any single install -- there are three independent pieces, and you need
+all three, done in order, before things actually work:
 
-0. **Syntax highlighting** (otherwise `.rsc`/`.ptl` render as plain,
+0. **Syntax highlighting** (otherwise `.rsc` renders as plain,
    uncolored text) -- via a TextMate bundle, installed by a one-time script.
 1. **Editing** (syntax errors, hover, completion, CodeLenses) -- via the
    [LSP4IJ](https://plugins.jetbrains.com/plugin/23257-lsp4ij) plugin and the
-   `run-rsc-lsp.sh` / `run-ptl-lsp.sh` launcher scripts.
+   `run-rsc-lsp.sh` launcher script.
 2. **Debugging** (breakpoints, stepping, variable inspection) -- via
    `rascal-terminal-plugin/` (published as **Rascal Debugger** in its own
    [public releases repo](https://github.com/Periteleios/intellij-plugin-rascal-debug)),
@@ -60,18 +60,18 @@ for what the script does and why the grammar needed patching.
 
 1. Install **LSP4IJ** from IntelliJ's Marketplace (Settings > Plugins >
    Marketplace > search "LSP4IJ").
-2. Make both launcher scripts executable (one-time):
+2. Make the launcher script executable (one-time):
    ```bash
-   chmod +x tools/intellij/run-rsc-lsp.sh tools/intellij/run-ptl-lsp.sh
+   chmod +x tools/intellij/run-rsc-lsp.sh
    ```
 3. Settings > Languages & Frameworks > Language Servers > **+** (add a new
-   server), twice -- once per file type:
+   server):
 
-   | | `.rsc` server | `.ptl` server |
-   |---|---|---|
-   | Server tab, Command | absolute path to `tools/intellij/run-rsc-lsp.sh` | absolute path to `tools/intellij/run-ptl-lsp.sh` |
-   | Mappings tab, file name pattern | `*.rsc` | `*.ptl` |
-   | Communication | stdio (default, leave as-is) | stdio (default, leave as-is) |
+   | | `.rsc` server |
+   |---|---|
+   | Server tab, Command | absolute path to `tools/intellij/run-rsc-lsp.sh` |
+   | Mappings tab, file name pattern | `*.rsc` |
+   | Communication | stdio (default, leave as-is) |
 
 4. Open any `.rsc` file under `src/main/rascal/` -- for example
    [Sanity.rsc](../../src/main/rascal/Sanity.rsc) (module `Sanity`). You
@@ -83,34 +83,24 @@ for what the script does and why the grammar needed patching.
 
 ### Running these scripts from a copy outside this checkout
 
-All three scripts (`run-rsc-lsp.sh`, `run-ptl-lsp.sh`,
-`compute-classpath.sh`) resolve "this project" from their own file
-location by default, but that's overridable: set `ADEPT_BASE_ROOT` (same
-place as `PTL_MILESTONE_ROOT` below -- that Language Server entry's
-**Environment variables** field, not the Command field) to an absolute
-path to a Maven-based Rascal project checkout -- despite the name, it
-doesn't have to be `adept-base` specifically, any such project works
-(the underlying language server jar has no idea which project it's
-serving); `adept-base` is just what this variable was named after and
-what this checkout's own team will actually point it at. A copy of these
-scripts living anywhere else will use whatever it's pointed at instead of
-computing a location from their own. This is how they're mirrored, still
-fully functional, into the
+Both scripts (`run-rsc-lsp.sh`, `compute-classpath.sh`) resolve "this
+project" from their own file location by default, but that's overridable:
+set `ADEPT_BASE_ROOT` (that Language Server entry's **Environment
+variables** field, not the Command field) to an absolute path to a
+Maven-based Rascal project checkout -- despite the name, it doesn't have
+to be `adept-base` specifically, any such project works (the underlying
+language server jar has no idea which project it's serving); `adept-base`
+is just what this variable was named after and what this checkout's own
+team will actually point it at. A copy of these scripts living anywhere
+else will use whatever it's pointed at instead of computing a location
+from their own. This is how they're mirrored, still fully functional,
+into the
 [public rascal-terminal-plugin releases repo](https://github.com/Periteleios/intellij-plugin-rascal-debug)
 alongside the syntax-highlighting bundle -- see that repo's own README.
 There's no way around needing an actual Maven-built Rascal project
 checkout somewhere on disk (the language server's own compiled
 implementation and its interpreted modules both come from that build),
 but the scripts no longer have to physically live inside it.
-
-The `.ptl` server as set up above puts this checkout's own `src/main/rascal`
-on its module search path -- there's no `.ptl` file here yet to try it on
-(this project's own sanity check, `Sanity.rsc`/`Helper.rsc`, is plain
-`.rsc`), but the setup is ready for whenever one is added. (`adept-base`,
-where this setup originally lived, additionally supports a
-`PTL_MILESTONE_ROOT` environment variable on this Language Server entry
-to scope editing to one of its own PTL "milestones" -- not applicable
-here, since this project has no such concept.)
 
 "Go to Definition" into standard library symbols (`IO::println`,
 `List::size`, `Set`, `String`, `util::FileSystem`, etc.) needs
@@ -124,12 +114,6 @@ into a stdlib symbol silently does nothing.
 e.g., `<rascal.version>`, `<rascal.lsp.version>`, `<typepal.version>`</span> <br>-- if those
 change, update the `RASCAL_JAR`/`LSP_JAR`/`TYPEPAL_JAR` paths at the top of
 each script to match.
-
-`run-ptl-lsp.sh` additionally embeds a captured `PathConfig` value. If PTL's
-language server dependencies change (new library jar, new source root) and
-`.ptl` editing stops working, that file's own header comment has the exact
-recapture steps (run a throwaway `ScratchProbe.rsc` module that prints
-`lang::ptl::LanguageServer::ptlLangForIDE()` and copy the new value in).
 
 ---
 
@@ -147,8 +131,8 @@ works against any Maven-based Rascal project, this one included.
 `build.gradle.kts`/`settings.gradle.kts`) is licensed under BSD 2-Clause
 -- see its [LICENSE](rascal-terminal-plugin/LICENSE) file. The four
 scripts directly in this directory (`setup-intellij-rascal-
-highlighting.sh`, `run-rsc-lsp.sh`, `run-ptl-lsp.sh`,
-`compute-classpath.sh`) are covered the same way, under their own
+highlighting.sh`, `run-rsc-lsp.sh`, `compute-classpath.sh`) are covered
+the same way, under their own
 [LICENSE](LICENSE) file one level up -- so any other project or company
 can use, modify, or redistribute any of this freely. This is separate
 from the syntax-highlighting bundle in part 0

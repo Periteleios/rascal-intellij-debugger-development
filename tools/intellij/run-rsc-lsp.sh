@@ -11,9 +11,8 @@
 #     Mappings tab: file name pattern *.rsc
 #     (communication stays stdio, the default)
 #
-# Two system properties are required, both taken from how this project's own
-# VS Code extension launches the same jar (see lsp-client/src/extension.ts,
-# buildPtlServerOptions):
+# Two system properties are required (taken from how the official VS Code
+# Rascal extension launches the same jar):
 #  1. -Drascal.lsp.deploy=true switches BaseLanguageServer from its dev-mode
 #     TCP-socket-on-port-8888 path (which collides with this project's own
 #     `hue` docker container) to stdio.
@@ -29,12 +28,11 @@
 # process also hosts every "Run in new Rascal terminal" REPL
 # (rascal-terminal-plugin drives it through this same server), so it needs
 # not just rascal/rascal-lsp/typepal but everything any interpreted module
-# might touch via @javaClass -- e.g. foreignFunctionInterface/FFI.rsc's
-# RascalWebSock needs org.json/io.socket/Jetty. Hardcoding that list by hand
-# here (and separately in run-ptl-lsp.sh, and separately again in the
-# plugin's RascalTerminalSupport.java) is exactly how this broke before: a
-# fix landed in two of the three copies and the bug kept happening via the
-# third. See compute-classpath.sh's own comment for the full story.
+# might touch via @javaClass. Hardcoding that list by hand here (and
+# separately in the plugin's RascalTerminalSupport.java) is exactly how
+# this broke before: a fix landed in one of the two copies and the bug
+# kept happening via the other. See compute-classpath.sh's own comment
+# for the full story.
 #
 # This script itself is portable -- it can be run from a location other
 # than tools/intellij/ inside this checkout (e.g. hosted alongside the

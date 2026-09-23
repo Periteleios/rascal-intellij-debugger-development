@@ -4,17 +4,16 @@
 # License -- see the LICENSE file in this directory.
 #
 # Computes (and caches) this project's full Maven-resolved dependency
-# classpath, for tools/intellij/run-rsc-lsp.sh, run-ptl-lsp.sh, and the
-# rascal-terminal-plugin's "Run/Import in new Rascal terminal" action to
-# share.
+# classpath, for tools/intellij/run-rsc-lsp.sh and the rascal-terminal-
+# plugin's "Run/Import in new Rascal terminal" action to share.
 #
-# Previously each of those three hand-maintained its own hardcoded jar
-# list (rascal/rascal-lsp/typepal, then later also org.json/io.socket/Jetty
-# for foreignFunctionInterface::FFI's RascalWebSock), duplicated across two
-# bash scripts and one Java source file. They silently drifted out of sync
-# -- a fix for a missing-jar NoClassDefFoundError landed in two of the three
-# copies and the bug kept happening via the third. This script exists so
-# there is exactly one place that computes the answer.
+# Previously each of those two hand-maintained its own hardcoded jar list
+# (rascal/rascal-lsp/typepal, plus whatever else a project's own
+# interpreted modules touch via @javaClass), duplicated across one bash
+# script and one Java source file. They silently drifted out of sync --
+# a fix for a missing-jar NoClassDefFoundError landed in one copy and the
+# bug kept happening via the other. This script exists so there is
+# exactly one place that computes the answer.
 #
 # Prints ONE line to stdout: the classpath (jar paths joined by the
 # platform path separator). Does NOT include target/classes -- callers
@@ -34,9 +33,9 @@
 # which needs network access the first time any given dependency version
 # hasn't been resolved into ~/.m2 before.
 #
-# Portable the same way run-rsc-lsp.sh/run-ptl-lsp.sh are: set
-# ADEPT_BASE_ROOT to point this at an adept-base checkout other than the
-# one this script happens to live in. See those scripts' own comments.
+# Portable the same way run-rsc-lsp.sh is: set ADEPT_BASE_ROOT to point
+# this at a project checkout other than the one this script happens to
+# live in. See that script's own comment.
 
 set -euo pipefail
 

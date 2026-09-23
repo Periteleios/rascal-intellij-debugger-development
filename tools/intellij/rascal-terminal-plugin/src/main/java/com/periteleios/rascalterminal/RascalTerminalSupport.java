@@ -113,11 +113,11 @@ final class RascalTerminalSupport {
      * Computes (and caches) a Maven-based Rascal project's full resolved
      * dependency classpath -- ported from what used to be a separate
      * tools/intellij/compute-classpath.sh script (see that file's own
-     * comment, still used by run-rsc-lsp.sh/run-ptl-lsp.sh, for the full
-     * history of why this needs to be one shared computation rather than
-     * separately hand-maintained jar lists: a fix for a missing-jar
-     * NoClassDefFoundError previously landed in two of three hardcoded
-     * copies and the bug kept happening via the third).
+     * comment, still used by run-rsc-lsp.sh, for the full history of why
+     * this needs to be one shared computation rather than separately
+     * hand-maintained jar lists: a fix for a missing-jar
+     * NoClassDefFoundError previously landed in one of two hardcoded
+     * copies and the bug kept happening via the other).
      * <p>
      * Caching: reused from {@code <projectRoot>/target/rascal-ide-
      * classpath.txt} as long as it's newer than pom.xml, the same cache
