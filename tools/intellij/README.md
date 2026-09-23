@@ -174,6 +174,15 @@ This only needs a destination to attach to -- the plugin fills in the actual
 port automatically every time you run something, so the port you enter here
 is just a placeholder.
 
+This run configuration is stored per-project (under that project's own
+`.idea/`), not per-machine or per-plugin-install -- it does **not** carry
+over between different projects or fresh checkouts, even on the same
+machine. If you see a notification like "No existing LSP4IJ DAP
+configuration found -- create one, then paste this port in" (with a port
+number already copied to your clipboard), it means you're hitting this
+step for the first time in *this* project: do steps 1-5 below once, using
+the clipboard port for step 4, and it won't ask again for this project.
+
 1. Run > Edit Configurations... > **+** > **Debug Adapter Protocol** (added
    by LSP4IJ).
 2. Give it a name (e.g. "Rascal Attach").
