@@ -1,0 +1,71 @@
+<idea-plugin>
+    <id>com.periteleios.rascal-terminal</id>
+    <name>Rascal Debugger</name>
+    <vendor>periteleios</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
+    <depends>com.redhat.devtools.lsp4ij</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="Rascal Terminal" displayType="BALLOON"/>
+        <!--
+          Bridges Rascal's `std:///` location scheme (baked into the compiled
+          standard library, see org.rascalmpl.uri.StandardLibraryURIResolver)
+          to IntelliJ's VFS. Without this, "Go to Definition" into stdlib
+          symbols (IO::println, List::size, etc.) silently fails: LSP4IJ's
+          UriConverterManager only handles file:/jar:/jrt:/WSL-UNC and falls
+          back to VirtualFileManager.findFileByUrl for anything else, which
+          has nothing registered for "std" until this extension point does.
+        -->
+        <virtualFileSystem implementationClass="com.periteleios.rascalterminal.StdFileSystem" key="std" physical="true"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
+        <!--
+          A distinct DAP server choice (selectable in a "Debug Adapter
+          Protocol" run configuration's server dropdown, alongside LSP4IJ's
+          built-in generic/"undefined" one) whose only real difference is
+          RascalDebugAdapterDescriptor -> RascalBreakpointHandler, which
+          fixes a real bug in LSP4IJ 0.21.0 (BreakpointHandlerBase
+          .unregisterBreakpoint checks the whole project's breakpoint list
+          for emptiness instead of just the affected file's, so disabling
+          one breakpoint while any other is active anywhere else in the
+          project never notifies the debug adapter,execution keeps
+          stopping at a breakpoint you just disabled). See
+          RascalBreakpointHandler's own javadoc for the full story.
+          Selecting "Rascal Debugger" here (not the generic/"undefined"
+          entry) is required to get this fix,see tools/intellij/README.md.
+        -->
+        <debugAdapterServer id="rascal"
+                             name="Rascal Debugger"
+                             factoryClass="com.periteleios.rascalterminal.RascalDebugAdapterDescriptorFactory"/>
+    </extensions>
+
+    <actions>
+        <!--
+          Rascal's LSP server (both RascalLanguageServer for .rsc and the
+          parametric server for e.g. .ptl) emits two CodeLenses, decompiled
+          from org.rascalmpl.vscode.lsp.rascal.RascalLanguageServices
+          #locateCodeLenses:
+            - "Import in new Rascal terminal" above a module declaration,
+              command "rascalmpl.importModule", one string argument: the
+              module's qualified name as written in source.
+            - "Run in new Rascal terminal" above a top-level function named
+              main(), command "rascalmpl.runMain", same single argument
+              (the enclosing module's qualified name, not the function
+              itself).
+          The action id below must match the command string verbatim; that
+          is how LSP4IJ's LSPCommandAction dispatch works (see
+          https://github.com/redhat-developer/lsp4ij/blob/main/docs/DeveloperGuide.md#lsp-commands).
+          VS Code's own extension implements these itself; LSP4IJ has no
+          built-in equivalent, which is why clicking these links in IntelliJ
+          otherwise fails with "Cannot execute '...' command! ... needs to
+          be contributed by an IntelliJ plugin."
+        -->
+        <action id="rascalmpl.importModule"
+                class="com.periteleios.rascalterminal.ImportModuleAction"/>
+        <action id="rascalmpl.runMain"
+                class="com.periteleios.rascalterminal.RunMainAction"/>
+    </actions>
+</idea-plugin>

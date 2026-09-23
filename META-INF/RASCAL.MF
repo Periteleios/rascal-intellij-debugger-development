@@ -1,0 +1,6 @@
+Manifest-Version: 0.0.1
+Project-Name: rascal-intellij-debugger
+Source: src/main/rascal
+Library: target/classes
+Main-Function: main
+Main-Module: Sanity
