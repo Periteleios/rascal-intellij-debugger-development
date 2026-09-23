@@ -1,7 +1,80 @@
 # IntelliJ setup for Rascal (highlighting + editing + debugging)
 
-This directory makes Rascal (`.rsc`) files readable and editable in
-IntelliJ IDEA. 
+This directory makes Rascal (`.rsc`) files readable, editable, and
+debuggable in IntelliJ IDEA. As of `rascal-debugger-plugin` 0.1.0,
+**installing the plugin is all you need to do** -- it auto-configures
+syntax highlighting, editing, and debugging on its own. The three
+separate manual setup steps this used to require (a highlighting script,
+a manually-added Language Server entry, a manually-created DAP Run/Debug
+configuration) still exist and still work, but only as an advanced
+fallback -- see "Advanced / manual setup" below.
+
+## Quick start
+
+Prerequisite: build the project once so `target/classes` exists and the
+Maven jars are in your local `~/.m2` repository:
+
+```bash
+./build.sh
+```
+
+Then install the plugin: Settings/Preferences > Plugins > gear icon (⚙) >
+**Manage Plugin Repositories...** > **+** > add:
+
+```
+https://raw.githubusercontent.com/Periteleios/rascal-intellij-debugger-releases/main/updatePlugins.xml
+```
+
+Apply, then go to the **Marketplace** tab and search "Rascal Debugger"
+(older releases may still show as "Rascal Terminal Commands") -- it should
+show up (possibly labeled as coming from a custom repository rather than
+the usual JetBrains vendor listing). Install it, restart when prompted.
+Future releases show up as normal plugin updates from then on -- no manual
+reinstalling.
+
+If you're actively developing the plugin itself rather than just using it,
+build and install it locally instead -- see "Building/updating the plugin
+jar" below, then Settings > Plugins > gear icon > **Install Plugin from
+Disk...**, restart when prompted.
+
+That's it. Open any `.rsc` file -- e.g.
+[Sanity.rsc](../../src/main/rascal/Sanity.rsc) -- and syntax highlighting,
+diagnostics/hover/CodeLenses, and breakpoints/stepping should all just
+work, against whichever Maven-based Rascal project is currently open (this
+one included, but not required -- see part 3 under "Advanced" for why
+none of this is specific to this checkout).
+
+### What gets auto-configured, and how
+
+Three plugin classes, each registered via an IntelliJ or LSP4IJ extension
+point -- worth knowing about if something doesn't work and you want to
+know where to look in `idea.log`:
+
+- **`RascalTextMateBundleProvider`** registers the syntax-highlighting
+  grammar (`rascal-textmate-bundle/`, shipped as a plugin resource,
+  extracted once to a real directory on first use -- TextMate bundles need
+  an actual filesystem path, not a jar resource).
+- **`RascalLanguageServerFactory`** registers the `.rsc` Language Server,
+  computing its classpath from whichever project is currently open (the
+  same computation "Import"/"Run in new Rascal terminal" already used) --
+  no `RASCAL_PROJECT_ROOT` env var needed for this path.
+- **`RascalProjectActivity`** auto-creates the "Rascal Attach" DAP
+  Run/Debug configuration on project open, including the exact
+  `*.rsc -> rascal` Mappings-tab entry that's easy to miss by hand and,
+  when missed, causes a completely silent breakpoint failure (no error, no
+  gutter dot -- see "Advanced / manual setup" part 3b below for the full
+  story of that bug). Idempotent: if a DAP configuration already exists
+  (of any name), it leaves it alone rather than creating a duplicate.
+
+---
+
+## Advanced / manual setup
+
+Everything below is what the plugin now does for you automatically. Use
+this instead if you want highlighting/editing without installing the
+plugin at all, want to understand exactly what the automatic setup is
+doing, or are developing the plugin itself and want the manual scripts as
+a separate, controllable path.
 
 1. **Syntax highlighting** (otherwise `.rsc` renders as plain,
    uncolored text) -- via a TextMate bundle, installed by a one-time script.
@@ -13,29 +86,21 @@ IntelliJ IDEA.
    [public releases repo](https://github.com/Periteleios/rascal-intellij-debugger-releases)),
    plus an LSP4IJ DAP ("Debug Adapter Protocol") Run/Debug configuration.
 
-Installing the "Rascal Debugger" plugin by itself (part 3) gets you
-breakpoints/stepping, the "Import"/"Run in new Rascal terminal" CodeLenses,
-and "Go to Definition" into the standard library -- it does **not** give you
-syntax highlighting or diagnostics/completion; those are parts 1 and 2,
-done separately, once, in this same checkout. Do all three before expecting
-anything to work end-to-end.
+Installing the "Rascal Debugger" plugin by itself (part 3) used to get you
+*only* breakpoints/stepping and the CodeLenses/"Go to Definition", not
+syntax highlighting or diagnostics/completion (parts 1 and 2) -- as of
+0.1.0 it now does all three automatically (see "Quick start" above). The
+manual steps below are equivalent to what it does for you, if you want to
+do any of them separately or by hand instead.
 
-Prerequisite for both: build the project once so `target/classes` exists
-and the Maven jars are in your local `~/.m2` repository:
-
-```bash
-./build.sh
-```
-
----
-
-# 1. Syntax highlighting
+### 1. Syntax highlighting
 
 IntelliJ has no built-in Rascal support, so without this `.rsc` files render
-as plain, uncolored text. <br>
-It will look for your (most recently modified `IntelliJIdeaXXX`) profile file under `~/.config/JetBrains` or
-`~/Library/Application Support/JetBrains`).<br>
-Pass one explicitly only if you have place it elsewhere.
+as plain, uncolored text. One-time setup -- no arguments needed, it
+auto-detects your IntelliJ profile (the most recently modified
+`IntelliJIdea*` directory under `~/.config/JetBrains` or
+`~/Library/Application Support/JetBrains`); pass one explicitly only if
+you have several installs and it picks the wrong one:
 
 ```bash
 tools/intellij/setup-intellij-rascal-highlighting.sh
@@ -51,9 +116,7 @@ list `rascal-basic` enabled. See
 [docs/intellij_rascal_highlighting.md](docs/intellij_rascal_highlighting.md)
 for what the script does and why the grammar needed patching.
 
----
-
-# 2. Editing: LSP4IJ language servers
+### 2. Editing: LSP4IJ language servers
 
 1. Install **LSP4IJ** from IntelliJ's Marketplace (Settings > Plugins >
    Marketplace > search "LSP4IJ").
@@ -78,7 +141,7 @@ for what the script does and why the grammar needed patching.
    'rascalmpl.importModule' command! ... needs to be contributed by an
    IntelliJ plugin") until you also do part 3 below.
 
-### Running these scripts from a copy outside this checkout
+#### Running these scripts from a copy outside this checkout
 
 Both scripts (`run-rsc-lsp.sh`, `compute-classpath.sh`) resolve "this
 project" from their own file location by default, but that's overridable:
@@ -110,9 +173,7 @@ e.g., `<rascal.version>`, `<rascal.lsp.version>`, `<typepal.version>`</span> <br
 change, update the `RASCAL_JAR`/`LSP_JAR`/`TYPEPAL_JAR` paths at the top of
 each script to match.
 
----
-
-# 3. Debugging: `rascal-debugger-plugin` + LSP4IJ DAP config
+### 3. Debugging: `rascal-debugger-plugin` + LSP4IJ DAP config
 
 Unlike parts 1 and 2, nothing here is specific to this checkout: the
 "Import"/"Run in new Rascal terminal" CodeLenses compute their classpath
@@ -135,48 +196,18 @@ from the syntax-highlighting bundle in part 1
 third-party project and not covered by either license (see that
 project's own README for its provenance).
 
-### 3a. Install the plugin
+#### 3a. Manually create the "Rascal Attach" Run/Debug configuration
 
-One-time setup: Settings/Preferences > Plugins > gear icon (⚙) > **Manage
-Plugin Repositories...** > **+** > add:
-
-```
-https://raw.githubusercontent.com/Periteleios/rascal-intellij-debugger-releases/main/updatePlugins.xml
-```
-
-Apply, then go to the **Marketplace** tab and search "Rascal Debugger"
-(older releases may still show as "Rascal Terminal Commands") -- it should
-show up (possibly labeled as coming from a custom repository rather than
-the usual JetBrains vendor listing). Install it, restart when prompted.
-Future releases show up as normal plugin updates from then on -- no manual
-reinstalling.
-
-(This repo -- and the plugin's actual source in `rascal-debugger-plugin/`
--- is public too now, but releases are still hosted separately, in that
-dedicated repo, since IntelliJ's plugin-repository feature needs a
-static `updatePlugins.xml` + release assets to auto-update from, not a
-source checkout. See that repo's own README for the release process if
-you're cutting a new version.)
-
-If you're actively developing the plugin itself rather than just using it,
-build and install it locally instead -- see "Building/updating the plugin
-jar" below, then Settings > Plugins > gear icon > **Install Plugin from
-Disk...**, restart when prompted.
-
-### 3b. Create one LSP4IJ DAP "Attach" Run/Debug configuration (one-time, per project)
+**Not needed as of 0.1.0** -- `RascalProjectActivity` does this
+automatically on project open (see "What gets auto-configured" above). The
+steps below are what it does for you, kept for reference and for anyone
+who wants to do it by hand instead (e.g. to customize it beyond the
+defaults).
 
 This only needs a destination to attach to -- the plugin fills in the actual
 port automatically every time you run something, so the port you enter here
-is just a placeholder.
-
-This Run/Debug configuration is stored per-project (under that project's
-own `.idea/`), not per-machine or per-plugin-install -- it does **not**
-carry over between different projects or fresh checkouts, even on the same
-machine. If you see a notification like "No existing LSP4IJ DAP
-configuration found -- create one, then paste this port in" (with a port
-number already copied to your clipboard), it means you're hitting this
-step for the first time in *this* project: do steps 1-5 below once, using
-the clipboard port for step 4, and it won't ask again for this project.
+is just a placeholder. It's stored per-project (under that project's own
+`.idea/`), not per-machine or per-plugin-install.
 
 1. Run > Edit Configurations... > **+** > **Debug Adapter Protocol** (added
    by LSP4IJ).
@@ -190,8 +221,11 @@ the clipboard port for step 4, and it won't ask again for this project.
 4. On the `Mappings` tab ("Declare file associations to allow setting
    breakpoints"), open the **File name patterns** sub-tab, click **+**, and
    add `*.rsc` with Language Id `rascal`. <br>
-   For confirmation, check the `serverMappings` xml tag in
-   `.idea/workspace.xml`
+   **This step is the one that's easy to miss and, when missed, causes a
+   completely silent breakpoint failure** (no error, no gutter dot -- this
+   is exactly the bug `RascalProjectActivity`'s auto-creation exists to
+   prevent). For confirmation, check the `serverMappings` xml tag in
+   `.idea/workspace.xml`:
    ```xml
    <option name="serverMappings">
      <list>
@@ -213,7 +247,7 @@ the clipboard port for step 4, and it won't ask again for this project.
    this was set up. You do not need to run this configuration yourself
    afterward -- the plugin launches it automatically.
 
-### 3c. Use it (also the verification step for 3a/3b)
+#### 3b. Use it (also the verification step for 3a)
 
 Open any `.rsc` file with a `main()` function -- e.g.
 [Sanity.rsc](../../src/main/rascal/Sanity.rsc) -- and click "Run in new
@@ -222,7 +256,7 @@ and enables the interpreter's debugger; the plugin then:
 
 - captures that terminal's real process id,
 - polls for the new port `org.rascalmpl.dap.DebugSocketServer` opens,
-- writes that port into the DAP Run/Debug configuration from 3b and launches it.
+- writes that port into the DAP Run/Debug configuration from 3a and launches it.
 
 A notification balloon confirms this ("Attaching Rascal debugger on port
 ..."). Set a breakpoint and type `main(...)` (with whatever arguments you
@@ -234,7 +268,8 @@ against.
 If the notification instead says the port lookup failed or was skipped, or
 no DAP Run/Debug configuration was found, check `idea.log` (Help > Show Log in
 Files/Finder) for a `RascalTerminalSupport`/`RascalDebugPortFinder`/
-`RascalDebugAttachConfigurator` entry -- every failure path logs there.
+`RascalDebugAttachConfigurator`/`RascalProjectActivity` entry -- every
+failure path logs there.
 
 ---
 
@@ -285,6 +320,12 @@ export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 1
 IntelliJ instance, the fast loop for iterating without reinstalling into
 your real IDE each time (see "Building/updating the plugin jar" above for
 why a real install still needs a rebuild + "Install Plugin from Disk").
+This is also the best way to verify the auto-configuration in "Quick
+start" above actually works with zero prior setup, since the sandbox
+starts with none of its own -- see this project's own commit history for
+the exact log line (`RascalProjectActivity - Auto-created the "Rascal
+Attach" DAP configuration for ...`) that proves the auto-creation path
+actually ran, not just that a configuration happened to already exist.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
@@ -335,7 +376,8 @@ export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 1
 To ship a new version to the rest of the team (rather than just testing
 locally), see the release steps in
 [Periteleios/rascal-intellij-debugger-releases](https://github.com/Periteleios/rascal-intellij-debugger-releases)'s
-README -- that's the public repo hosting releases (see 3a above for why).
+README -- that's the public repo hosting releases (see "Quick start"
+above for why).
 
 Notes:
 - First build downloads a full IntelliJ IDEA IU platform artifact (matching
