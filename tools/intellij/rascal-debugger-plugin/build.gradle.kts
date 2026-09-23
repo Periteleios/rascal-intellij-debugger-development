@@ -33,9 +33,19 @@ intellijPlatform {
     }
 }
 
-tasks {
-    withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
-    }
+// A plain sourceCompatibility/targetCompatibility string assignment on
+// JavaCompile is silently ineffective here -- confirmed live: it still
+// produced class files at major version 69 (Java 25) instead of 61 (Java
+// 17), which is why the built plugin failed to load on an IDE whose own
+// boot JDK was older (e.g. 21: UnsupportedClassVersionError). `--release`
+// is the flag that actually gets honored; switching to a JDK 17 *toolchain*
+// instead (rather than just adding this flag) doesn't work either --
+// IntelliJ Platform 2026.2.2's own jars (e.g. util.jar) are themselves
+// class version 69, and an actual JDK 17 javac binary can't parse those
+// while reading the compile classpath ("bad class file ... has wrong
+// version 69.0, should be 61.0"). Keeping the ambient (newer) javac and
+// only passing --release avoids that, since a newer compiler can always
+// read older-or-equal class files.
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(17)
 }
