@@ -5,9 +5,12 @@
  */
 package com.periteleios.rascalterminal;
 
+import com.intellij.execution.configurations.PathEnvironmentVariableUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.util.EnvironmentUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -87,13 +90,26 @@ final class RascalDebugPortFinder {
      * output is always numeric, and {@code -a -iTCP -sTCP:LISTEN} restrict
      * the listing to just this PID's listening TCP sockets, e.g.:
      * {@code java  12345 user  123u  IPv6 0x...  0t0  TCP *:54321 (LISTEN)}
+     * <p>
+     * Resolves {@code lsof}'s absolute path the same way {@link
+     * RascalTerminalSupport#computeDependencyClasspath} resolves {@code mvn}
+     * -- a bare command name is looked up against the *launching* IDE
+     * process's own PATH, not whatever this ProcessBuilder's environment is
+     * configured with, so a GUI-launched IDE on macOS could fail to find
+     * even a system binary like {@code lsof} the same way it failed to find
+     * {@code mvn}, silently leaving port discovery empty for the entire
+     * polling window instead of erroring out immediately.
      */
     private static Set<Integer> listeningPortsMac(long pid) {
         Set<Integer> ports = new HashSet<>();
         try {
-            Process process = new ProcessBuilder(
-                "lsof", "-a", "-p", String.valueOf(pid), "-iTCP", "-sTCP:LISTEN", "-P", "-n"
-            ).redirectErrorStream(true).start();
+            File lsofExecutable = PathEnvironmentVariableUtil.findInPath("lsof");
+            String lsofCommand = lsofExecutable != null ? lsofExecutable.getAbsolutePath() : "lsof";
+            ProcessBuilder builder = new ProcessBuilder(
+                lsofCommand, "-a", "-p", String.valueOf(pid), "-iTCP", "-sTCP:LISTEN", "-P", "-n"
+            ).redirectErrorStream(true);
+            builder.environment().putAll(EnvironmentUtil.getEnvironmentMap());
+            Process process = builder.start();
             List<String> lines;
             try (var reader = process.inputReader()) {
                 lines = reader.lines().toList();

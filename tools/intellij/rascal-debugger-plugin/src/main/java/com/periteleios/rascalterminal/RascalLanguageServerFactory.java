@@ -35,7 +35,11 @@ import java.util.List;
  * The classpath is computed the exact same way "Run in new Rascal terminal"
  * already computes its own -- see {@link RascalTerminalSupport#computeClasspath}
  * -- so this server always matches whatever project is actually open in
- * IntelliJ.
+ * IntelliJ. Same for the {@code java} binary itself: launched via
+ * {@link RascalTerminalSupport#javaExecutable}'s absolute path rather than a
+ * bare {@code "java"}, which would otherwise get resolved against whatever
+ * PATH this plugin's own JVM happened to inherit -- not necessarily the same
+ * PATH (or even the same java version) a real interactive shell would use.
  */
 public final class RascalLanguageServerFactory implements LanguageServerFactory {
 
@@ -52,7 +56,7 @@ public final class RascalLanguageServerFactory implements LanguageServerFactory 
         }
 
         GeneralCommandLine commandLine = new GeneralCommandLine(List.of(
-            "java",
+            RascalTerminalSupport.javaExecutable(),
             "-Drascal.lsp.deploy=true",
             "-Drascal.fallbackResolver=org.rascalmpl.vscode.lsp.uri.FallbackResolver",
             "-cp", classpath,

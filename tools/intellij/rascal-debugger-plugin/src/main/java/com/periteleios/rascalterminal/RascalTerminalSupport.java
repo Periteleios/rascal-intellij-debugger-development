@@ -71,8 +71,14 @@ final class RascalTerminalSupport {
             // `exec` replaces the shell process image instead of forking a
             // child, so the terminal's own process becomes the JVM itself
             // -- letting us read its real PID below (needed to find the
-            // debug port later; see RascalDebugPortFinder).
-            runInTerminal(widget, "exec java -cp \"" + cp + "\" org.rascalmpl.shell.RascalShell");
+            // debug port later; see RascalDebugPortFinder). Uses the exact
+            // same JVM running this plugin (see javaExecutable()) rather
+            // than a bare "java" resolved by the shell's own PATH -- a real
+            // machine had an ancient JDK 8 on that PATH, which crashed
+            // RascalShell with UnsupportedClassVersionError before it ever
+            // reached ":set debugging true", with nothing surfaced anywhere
+            // IntelliJ's own logging could see (it's all inside the PTY).
+            runInTerminal(widget, "exec \"" + javaExecutable() + "\" -cp \"" + cp + "\" org.rascalmpl.shell.RascalShell");
 
             // ShellTerminalWidget wires up its ProcessTtyConnector
             // asynchronously -- reading it synchronously right after
@@ -108,6 +114,21 @@ final class RascalTerminalSupport {
         Path projectRoot = Path.of(project.getBasePath());
         String projectClasses = projectRoot.resolve("target").resolve("classes").toString();
         return computeDependencyClasspath(projectRoot) + java.io.File.pathSeparator + projectClasses;
+    }
+
+    /**
+     * Absolute path to the JVM currently running this plugin (i.e. IntelliJ's
+     * own bundled runtime), for launching Rascal's own jars with. Package-
+     * private so it can also be called by {@link RascalLanguageServerFactory}
+     * -- deliberately avoiding a bare {@code "java"}, which gets resolved
+     * against whatever's first on the *shell's* PATH and could be an
+     * unrelated, arbitrarily old JDK (confirmed live: JDK 8, far too old for
+     * Rascal's own jars, crashing with UnsupportedClassVersionError before
+     * ever reaching any of our own code). IntelliJ's own bundled runtime is
+     * guaranteed modern enough, since IntelliJ itself needs it to run.
+     */
+    static String javaExecutable() {
+        return Path.of(System.getProperty("java.home"), "bin", "java").toString();
     }
 
     /**
