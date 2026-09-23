@@ -267,12 +267,14 @@ Output: `build/distributions/rascal-debugger-<version>.zip` (version from
 These come from the IntelliJ Platform Gradle plugin itself
 (`org.jetbrains.intellij.platform`, applied in `build.gradle.kts`) -- run
 `./gradlew tasks` (from `tools/intellij/rascal-debugger-plugin/`) for the
-full list; this is just the subset actually useful day to day. Each command
-below is self-contained (includes its own `cd`) so it also works if you run
-it by clicking IntelliJ's inline "run" icon directly on one of these lines
--- unlike a bare `./gradlew clean`, which fails with "Directory ... does
-not contain a build" if run standalone from the repo root instead of from
-`rascal-debugger-plugin/`:
+full list; this is just the subset actually useful day to day. Each block
+below is self-contained (its own `cd` and `JAVA_HOME`, same as the
+`buildPlugin` example above) so it also works standalone if you run it by
+clicking IntelliJ's inline "run" icon directly on it -- unlike a bare
+`./gradlew clean`, which fails with "Directory ... does not contain a
+build" if run from the repo root instead of from
+`rascal-debugger-plugin/`, or "Gradle requires JVM 17 or later" if
+`JAVA_HOME` isn't set:
 
 **Clean build output** -- deletes `build/` entirely: the compiled classes,
 the instrumented bytecode, and the zip from `buildPlugin`. Use this if a
@@ -280,7 +282,9 @@ stale build is ever in doubt; `buildPlugin` alone does not wipe prior
 output first.
 
 ```bash
-cd tools/intellij/rascal-debugger-plugin && ./gradlew clean
+cd tools/intellij/rascal-debugger-plugin
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+./gradlew clean
 ```
 
 **Launch a sandbox IDE with the plugin pre-installed** -- a disposable
@@ -289,7 +293,9 @@ your real IDE each time (see "Building/updating the plugin jar" above for
 why a real install still needs a rebuild + "Install Plugin from Disk").
 
 ```bash
-cd tools/intellij/rascal-debugger-plugin && ./gradlew runIde
+cd tools/intellij/rascal-debugger-plugin
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+./gradlew runIde
 ```
 
 **Reset that sandbox instance** -- wipes its own state (config/plugins/
@@ -297,7 +303,9 @@ system dirs under `.intellijPlatform/sandbox/`) if `runIde` ever gets into
 a broken state. Separate from `clean`, which doesn't touch it.
 
 ```bash
-cd tools/intellij/rascal-debugger-plugin && ./gradlew cleanSandbox
+cd tools/intellij/rascal-debugger-plugin
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+./gradlew cleanSandbox
 ```
 
 **Verify IDE-version compatibility** -- runs the IntelliJ Plugin Verifier
@@ -306,7 +314,9 @@ Catches "this won't load on IDE version X" problems before shipping a
 release.
 
 ```bash
-cd tools/intellij/rascal-debugger-plugin && ./gradlew verifyPlugin
+cd tools/intellij/rascal-debugger-plugin
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+./gradlew verifyPlugin
 ```
 
 **Sanity-check the Gradle project setup** -- JDK version, `plugin.xml`
@@ -314,14 +324,18 @@ fields, target platform compatibility. Worth running after editing
 `build.gradle.kts`.
 
 ```bash
-cd tools/intellij/rascal-debugger-plugin && ./gradlew verifyPluginProjectConfiguration
+cd tools/intellij/rascal-debugger-plugin
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+./gradlew verifyPluginProjectConfiguration
 ```
 
 **Run the unit test suite** -- none exist yet; this is the task to wire up
 if/when tests are added under `src/test/java/`.
 
 ```bash
-cd tools/intellij/rascal-debugger-plugin && ./gradlew test
+cd tools/intellij/rascal-debugger-plugin
+export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 17+
+./gradlew test
 ```
 
 To ship a new version to the rest of the team (rather than just testing
