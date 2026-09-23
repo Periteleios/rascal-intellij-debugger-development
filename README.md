@@ -1,9 +1,8 @@
-# rascal-intellij-debugger
+# rascal-intellij-debugger-development
 
 Standalone home for the **Rascal Debugger** IntelliJ plugin
-(`tools/intellij/rascal-debugger-plugin/`) and its supporting scripts
-(`tools/intellij/`), plus a minimal Maven-based Rascal project
-(`src/main/rascal/`) to develop and test them against.
+(`tools/intellij/rascal-debugger-plugin/`), plus a minimal Maven-based
+Rascal project (`src/main/rascal/`) to develop and test it against.
 
 This project exists to prove and use, in practice, what the plugin itself
 guarantees: it works with **any** Maven-based Rascal project, not a
@@ -15,15 +14,14 @@ public home for it instead.
 
 - `tools/intellij/rascal-debugger-plugin/` -- the actual IntelliJ plugin
   source (Java + Gradle). BSD 2-Clause licensed, see its own `LICENSE`.
-- `tools/intellij/{run-rsc-lsp.sh,compute-classpath.sh,
-  setup-intellij-rascal-highlighting.sh}` -- the supporting scripts (LSP
-  language server + syntax highlighting setup). BSD 2-Clause licensed,
-  see `tools/intellij/LICENSE`.
-- `tools/intellij/rascal-textmate-bundle/` + `tools/intellij/docs/intellij_rascal_highlighting.md`
-  -- the TextMate syntax-highlighting grammar. This one is a derivative of
-  a separate third-party project (`thron7/vsc-rascal`, itself unlicensed
-  upstream) and is **not** covered by the BSD 2-Clause license above --
-  see that doc for its provenance.
+  As of 0.1.0, installing this plugin auto-configures syntax
+  highlighting, editing, and debugging on its own -- see
+  `tools/intellij/README.md` for how.
+- `.../src/main/resources/rascal-textmate-bundle/` -- the bundled
+  syntax-highlighting grammar. **Not** covered by the plugin's own BSD
+  2-Clause license above: its own `"about"` field states it started
+  from [VS Code's Java grammar](https://github.com/microsoft/vscode/blob/master/extensions/java/syntaxes/java.tmLanguage.json),
+  MIT licensed (c) Microsoft.
 - `pom.xml` + `src/main/rascal/{Sanity.rsc,Helper.rsc}` -- a minimal
   Rascal project, just enough to compile and to exercise the plugin
   against: `Sanity::main` imports `Helper`, so you can test breakpoints,
