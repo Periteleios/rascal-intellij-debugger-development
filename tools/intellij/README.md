@@ -10,7 +10,7 @@ IntelliJ IDEA.
    `run-rsc-lsp.sh` launcher script.
 3. **Debugging** (breakpoints, stepping, variable inspection) -- via
    `rascal-debugger-plugin/` (published as **Rascal Debugger** in its own
-   [public releases repo](https://github.com/Periteleios/intellij-plugin-rascal-debug)),
+   [public releases repo](https://github.com/Periteleios/rascal-intellij-debugger-releases)),
    plus an LSP4IJ DAP ("Debug Adapter Protocol") Run/Debug configuration.
 
 Installing the "Rascal Debugger" plugin by itself (part 3) gets you
@@ -92,7 +92,7 @@ team will actually point it at. A copy of these scripts living anywhere
 else will use whatever it's pointed at instead of computing a location
 from their own. This is how they're mirrored, still fully functional,
 into the
-[public rascal-debugger-plugin releases repo](https://github.com/Periteleios/intellij-plugin-rascal-debug)
+[public rascal-debugger-plugin releases repo](https://github.com/Periteleios/rascal-intellij-debugger-releases)
 alongside the syntax-highlighting bundle -- see that repo's own README.
 There's no way around needing an actual Maven-built Rascal project
 checkout somewhere on disk (the language server's own compiled
@@ -143,7 +143,7 @@ One-time setup: Settings/Preferences > Plugins > gear icon (⚙) > **Manage
 Plugin Repositories...** > **+** > add:
 
 ```
-https://raw.githubusercontent.com/Periteleios/intellij-plugin-rascal-debug/main/updatePlugins.xml
+https://raw.githubusercontent.com/Periteleios/rascal-intellij-debugger-releases/main/updatePlugins.xml
 ```
 
 Apply, then go to the **Marketplace** tab and search "Rascal Debugger"
@@ -336,7 +336,7 @@ export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 1
 
 To ship a new version to the rest of the team (rather than just testing
 locally), see the release steps in
-[Periteleios/intellij-plugin-rascal-debug](https://github.com/Periteleios/intellij-plugin-rascal-debug)'s
+[Periteleios/rascal-intellij-debugger-releases](https://github.com/Periteleios/rascal-intellij-debugger-releases)'s
 README -- that's the public repo hosting releases (see 3a above for why).
 
 Notes:
