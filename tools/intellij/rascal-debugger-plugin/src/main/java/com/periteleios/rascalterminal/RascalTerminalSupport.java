@@ -11,6 +11,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.EnvironmentUtil;
 import org.jetbrains.plugins.terminal.ShellTerminalWidget;
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 
@@ -135,11 +136,24 @@ final class RascalTerminalSupport {
         }
 
         Files.createDirectories(target);
-        Process process = new ProcessBuilder(
+        ProcessBuilder builder = new ProcessBuilder(
             "mvn", "-q", "-f", pom.toString(),
             "dependency:build-classpath",
             "-Dmdep.outputFile=" + cacheFile
-        ).redirectErrorStream(true).start();
+        ).redirectErrorStream(true);
+        // A GUI-launched IDE process (as opposed to one started from a
+        // terminal) inherits a minimal PATH on macOS -- typically missing
+        // wherever Homebrew/SDKMAN put `mvn` -- so "mvn" resolves fine for
+        // "Run in new Rascal terminal" (a real login shell) but can fail
+        // here. EnvironmentUtil.getEnvironmentMap() runs the user's actual
+        // login shell once and caches its resulting environment (PATH
+        // included) -- IntelliJ's own established fix for exactly this
+        // class of problem. Prompted by a Mac user hitting
+        // CannotStartServerException ("rascal-lsp", pid=null) -- consistent
+        // with this process never starting at all -- though not fully
+        // root-caused against a "Caused by:" trace before this landed.
+        builder.environment().putAll(EnvironmentUtil.getEnvironmentMap());
+        Process process = builder.start();
 
         String output;
         try (var reader = process.inputReader()) {
