@@ -78,6 +78,15 @@
             <src>${project.basedir}/src/main/rascal</src>
           </srcs>
         </configuration>
+        <executions>
+          <execution>
+            <id>compile-rascal</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

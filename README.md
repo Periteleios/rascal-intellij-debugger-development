@@ -39,7 +39,7 @@ of it.
 ## Getting started
 
 ```bash
-mvn clean compile dependency:resolve
+./build.sh
 ```
 
 Then open this directory as a project in IntelliJ IDEA and follow

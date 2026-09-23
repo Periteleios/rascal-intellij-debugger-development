@@ -24,7 +24,7 @@ Prerequisite for both: build the project once so `target/classes` exists
 and the Maven jars are in your local `~/.m2` repository:
 
 ```bash
-mvn clean compile dependency:resolve
+./build.sh
 ```
 
 ---
@@ -192,16 +192,8 @@ the clipboard port for step 4, and it won't ask again for this project.
 4. On the `Mappings` tab ("Declare file associations to allow setting
    breakpoints"), open the **File name patterns** sub-tab, click **+**, and
    add `*.rsc` with Language Id `rascal`. <br>
-   **Without this, breakpoints don't work at all** -- clicking the gutter
-   next to any line silently does nothing, no dot appears, no error. This
-   is because LSP4IJ's `DAPBreakpointType.canPutAt` (the check IntelliJ
-   runs before it'll even let you click a gutter) delegates to
-   `DebugAdapterManager.isDebuggableFile`, which is gated by exactly this
-   mapping -- with no mapping, IntelliJ considers *no* file debuggable, so
-   the gutter never responds anywhere. See this exact `serverMappings`
-   block already present in a working reference project's own
-   `.idea/workspace.xml` for confirmation if you want to double check
-   yours matches:
+   For confirmation, check the `serverMappings` xml tag in
+   `.idea/workspace.xml`
    ```xml
    <option name="serverMappings">
      <list>
