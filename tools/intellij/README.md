@@ -262,6 +262,23 @@ export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # any JDK 17+; Gradle itself needs 1
 Output: `build/distributions/rascal-debugger-<version>.zip` (version from
 `build.gradle.kts`).
 
+###### Other Gradle tasks worth knowing
+
+All run from `tools/intellij/rascal-debugger-plugin/`, same `JAVA_HOME` as
+above. These come from the IntelliJ Platform Gradle plugin itself
+(`org.jetbrains.intellij.platform`, applied in `build.gradle.kts`) -- run
+`./gradlew tasks` for the full list; this is just the subset actually useful
+day to day:
+
+| Command | What it does |
+|---|---|
+| `./gradlew clean` | Deletes `build/` entirely -- the compiled classes, the instrumented bytecode, and the zip from `buildPlugin`. Use this if a stale build is ever in doubt; `buildPlugin` alone does not wipe prior output first. |
+| `./gradlew runIde` | Launches a disposable sandbox IntelliJ instance with this plugin pre-installed -- the fast loop for iterating without reinstalling into your real IDE each time (see "Building/updating the plugin jar" above for why a real install still needs a rebuild + "Install Plugin from Disk"). |
+| `./gradlew cleanSandbox` | Wipes that sandbox instance's own state (its config/plugins/system dirs under `.intellijPlatform/sandbox/`) if `runIde` ever gets into a broken state -- separate from `clean`, which doesn't touch it. |
+| `./gradlew verifyPlugin` | Runs the IntelliJ Plugin Verifier against the `sinceBuild`/`untilBuild` range declared in `build.gradle.kts` -- catches "this won't load on IDE version X" problems before shipping a release. |
+| `./gradlew verifyPluginProjectConfiguration` | Sanity-checks the Gradle project setup itself (JDK version, `plugin.xml` fields, target platform compatibility) -- worth running after editing `build.gradle.kts`. |
+| `./gradlew test` | Runs the unit test suite. None exist yet -- this is the task to wire up if/when tests are added under `src/test/java/`. |
+
 To ship a new version to the rest of the team (rather than just testing
 locally), see the release steps in
 [Periteleios/intellij-plugin-rascal-debug](https://github.com/Periteleios/intellij-plugin-rascal-debug)'s
@@ -275,9 +292,6 @@ Notes:
   wires up `dependencyResolutionManagement`; don't remove that in favor of a
   plain `repositories {}` block in `build.gradle.kts` without testing --
   this project needed it to resolve `intellijIdea(...)` at all.
-- `./gradlew runIde` launches a disposable sandbox IntelliJ instance with the
-  plugin pre-installed, useful for iterating without reinstalling into your
-  real IDE each time.
 - `.intellijPlatform/`, `.gradle/`, `.idea/`, and `build/` under
   `rascal-debugger-plugin/` are all gitignored -- if `git status` ever shows
   changes under any of those, you likely ran a build command from the wrong
