@@ -91,7 +91,7 @@ final class RascalTerminalSupport {
                 runInTerminal(widget, ":set debugging true");
                 if (pid <= 0) {
                     notify(project, "Rascal debug port lookup skipped for " + moduleName,
-                        "Could not determine the terminal's process id (see idea.log for RascalTerminalSupport) -- find the port with ps/ss and paste it into LSP4IJ's Attach config manually.",
+                        "Could not determine the terminal's process id (see idea.log for RascalTerminalSupport) -- find the port with `lsof -i -P -n -p <pid>` (macOS) or `ss -ltnp` (Linux) and paste it into LSP4IJ's Attach config manually.",
                         NotificationType.WARNING);
                     return;
                 }

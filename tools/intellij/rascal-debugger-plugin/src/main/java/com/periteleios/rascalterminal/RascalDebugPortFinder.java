@@ -5,6 +5,9 @@
  */
 package com.periteleios.rascalterminal;
 
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.SystemInfo;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -14,20 +17,29 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Finds the TCP port org.rascalmpl.dap.DebugSocketServer bound for a given
- * process, without shelling out to `ps`/`ss`. DebugSocketServer picks the
- * port itself via `new ServerSocket(0)` (an OS-assigned ephemeral port) and,
- * per the decompiled bytecode of org.rascalmpl.ideservices.IDEServices,
- * never reports it anywhere a bare org.rascalmpl.shell.RascalShell process
- * can surface it (registerDebugServerPort/startDebuggingSession are no-op
- * default methods unless the caller supplies its own IDEServices, which
- * RascalShell doesn't). So the only way to learn the port is to look at the
- * OS's own view of that process's sockets directly -- this reads it straight
- * out of /proc rather than parsing `ss`/`lsof` output.
+ * process. DebugSocketServer picks the port itself via `new ServerSocket(0)`
+ * (an OS-assigned ephemeral port) and, per the decompiled bytecode of
+ * org.rascalmpl.ideservices.IDEServices, never reports it anywhere a bare
+ * org.rascalmpl.shell.RascalShell process can surface it
+ * (registerDebugServerPort/startDebuggingSession are no-op default methods
+ * unless the caller supplies its own IDEServices, which RascalShell
+ * doesn't). So the only way to learn the port is to look at the OS's own
+ * view of that process's sockets directly -- on Linux this reads it
+ * straight out of /proc (no subprocess needed); macOS has no /proc, so
+ * there {@code lsof} is used instead (present by default). Any other OS
+ * isn't supported -- see {@link #listeningPorts}.
  */
 final class RascalDebugPortFinder {
+
+    private static final Logger LOG = Logger.getInstance(RascalDebugPortFinder.class);
+    private static final AtomicBoolean UNSUPPORTED_OS_LOGGED = new AtomicBoolean();
+    private static final Pattern MAC_LSOF_LISTEN_PORT = Pattern.compile(":(\\d+)\\s*\\(LISTEN\\)\\s*$");
 
     private RascalDebugPortFinder() {
     }
@@ -42,6 +54,21 @@ final class RascalDebugPortFinder {
      * after the terminal launches).
      */
     static Set<Integer> listeningPorts(long pid) {
+        if (SystemInfo.isLinux) {
+            return listeningPortsLinux(pid);
+        }
+        if (SystemInfo.isMac) {
+            return listeningPortsMac(pid);
+        }
+        if (UNSUPPORTED_OS_LOGGED.compareAndSet(false, true)) {
+            LOG.warn("Automatic Rascal debug port discovery isn't implemented for "
+                + SystemInfo.OS_NAME + " (only Linux and macOS are supported) -- "
+                + "find the port manually and paste it into LSP4IJ's Attach config.");
+        }
+        return new HashSet<>();
+    }
+
+    private static Set<Integer> listeningPortsLinux(long pid) {
         Set<Integer> ports = new HashSet<>();
         Set<Long> inodes = socketInodes(pid);
         if (inodes.isEmpty()) {
@@ -53,8 +80,48 @@ final class RascalDebugPortFinder {
         return ports;
     }
 
+    /**
+     * macOS has no /proc, so this shells out to {@code lsof} instead (no shell
+     * involved -- args are passed directly to ProcessBuilder, not through
+     * `sh -c`). {@code -P -n} disable port/host name resolution so the
+     * output is always numeric, and {@code -a -iTCP -sTCP:LISTEN} restrict
+     * the listing to just this PID's listening TCP sockets, e.g.:
+     * {@code java  12345 user  123u  IPv6 0x...  0t0  TCP *:54321 (LISTEN)}
+     */
+    private static Set<Integer> listeningPortsMac(long pid) {
+        Set<Integer> ports = new HashSet<>();
+        try {
+            Process process = new ProcessBuilder(
+                "lsof", "-a", "-p", String.valueOf(pid), "-iTCP", "-sTCP:LISTEN", "-P", "-n"
+            ).redirectErrorStream(true).start();
+            List<String> lines;
+            try (var reader = process.inputReader()) {
+                lines = reader.lines().toList();
+            }
+            process.waitFor();
+            for (String line : lines) {
+                Matcher matcher = MAC_LSOF_LISTEN_PORT.matcher(line);
+                if (matcher.find()) {
+                    try {
+                        ports.add(Integer.parseInt(matcher.group(1)));
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+        } catch (IOException e) {
+            LOG.warn("Failed to run lsof for PID " + pid, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return ports;
+    }
+
     /** Polls until a LISTEN port not present in {@code before} appears, or the timeout elapses. */
     static Optional<Integer> waitForNewListeningPort(long pid, Set<Integer> before, Duration timeout) {
+        // Linux polling is just a couple of file reads, cheap at 200ms; the
+        // macOS path spawns an `lsof` subprocess per tick, so it polls less
+        // often (90s of timeout is ~450 spawns at 200ms vs. ~180 at 500ms).
+        long pollIntervalMs = SystemInfo.isMac ? 500 : 200;
         long deadline = System.nanoTime() + timeout.toNanos();
         while (System.nanoTime() < deadline) {
             Set<Integer> now = listeningPorts(pid);
@@ -63,7 +130,7 @@ final class RascalDebugPortFinder {
                 return Optional.of(now.iterator().next());
             }
             try {
-                Thread.sleep(200);
+                Thread.sleep(pollIntervalMs);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 return Optional.empty();
