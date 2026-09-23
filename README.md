@@ -19,7 +19,7 @@ public home for it instead.
   setup-intellij-rascal-highlighting.sh}` -- the supporting scripts (LSP
   language server + syntax highlighting setup). BSD 2-Clause licensed,
   see `tools/intellij/LICENSE`.
-- `scripts/intellij-rascal-bundle/` + `docs/intellij_rascal_highlighting.md`
+- `tools/intellij/intellij-rascal-bundle/` + `tools/intellij/docs/intellij_rascal_highlighting.md`
   -- the TextMate syntax-highlighting grammar. This one is a derivative of
   a separate third-party project (`thron7/vsc-rascal`, itself unlicensed
   upstream) and is **not** covered by the BSD 2-Clause license above --

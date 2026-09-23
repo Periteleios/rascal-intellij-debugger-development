@@ -51,7 +51,7 @@ confirmation before editing its settings files -- safest to close
 IntelliJ first, run the script, then reopen it. Restart IntelliJ, then
 verify: Settings > Editor > TextMate Bundles should
 list `rascal-basic` enabled. See
-[docs/intellij_rascal_highlighting.md](../../docs/intellij_rascal_highlighting.md)
+[docs/intellij_rascal_highlighting.md](docs/intellij_rascal_highlighting.md)
 for what the script does and why the grammar needed patching.
 
 ---
@@ -136,7 +136,7 @@ the same way, under their own
 [LICENSE](LICENSE) file one level up -- so any other project or company
 can use, modify, or redistribute any of this freely. This is separate
 from the syntax-highlighting bundle in part 0
-(`scripts/intellij-rascal-bundle/`), which is a derivative of a
+(`intellij-rascal-bundle/`), which is a derivative of a
 third-party project and not covered by either license (see that
 project's own README for its provenance).
 
