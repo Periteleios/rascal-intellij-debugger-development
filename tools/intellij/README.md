@@ -1,9 +1,7 @@
 # IntelliJ setup for Rascal (highlighting + editing + debugging)
 
 This directory makes Rascal (`.rsc`) files readable and editable in
-IntelliJ IDEA. None of this is automatic and none of it is bundled into
-any single install -- there are three independent pieces, and you need
-all three, done in order, before things actually work:
+IntelliJ IDEA. 
 
 1. **Syntax highlighting** (otherwise `.rsc` renders as plain,
    uncolored text) -- via a TextMate bundle, installed by a one-time script.
@@ -31,14 +29,13 @@ mvn clean compile dependency:resolve
 
 ---
 
-## 1. Syntax highlighting
+# 1. Syntax highlighting
 
 IntelliJ has no built-in Rascal support, so without this `.rsc` files render
-as plain, uncolored text. One-time setup -- no arguments needed, it
-auto-detects your IntelliJ profile (the most recently modified
-`IntelliJIdea*` directory under `~/.config/JetBrains` or
-`~/Library/Application Support/JetBrains`); pass one explicitly only if
-you have several installs and it picks the wrong one:
+as plain, uncolored text. <br>
+It will look for your (most recently modified `IntelliJIdeaXXX`) profile file under `~/.config/JetBrains` or
+`~/Library/Application Support/JetBrains`).<br>
+Pass one explicitly only if you have place it elsewhere.
 
 ```bash
 tools/intellij/setup-intellij-rascal-highlighting.sh
@@ -56,7 +53,7 @@ for what the script does and why the grammar needed patching.
 
 ---
 
-## 2. Editing: LSP4IJ language servers
+# 2. Editing: LSP4IJ language servers
 
 1. Install **LSP4IJ** from IntelliJ's Marketplace (Settings > Plugins >
    Marketplace > search "LSP4IJ").
@@ -117,7 +114,7 @@ each script to match.
 
 ---
 
-## 3. Debugging: `rascal-debugger-plugin` + LSP4IJ DAP config
+# 3. Debugging: `rascal-debugger-plugin` + LSP4IJ DAP config
 
 Unlike parts 1 and 2, nothing here is specific to this checkout: the
 "Import"/"Run in new Rascal terminal" CodeLenses compute their classpath
@@ -186,26 +183,45 @@ the clipboard port for step 4, and it won't ask again for this project.
 1. Run > Edit Configurations... > **+** > **Debug Adapter Protocol** (added
    by LSP4IJ).
 2. Give it a name (e.g. "Rascal Attach").
-3. **Set the Server dropdown to "Rascal Debugger"** -- not the default/
-   generic entry. This is the one setting that actually matters here: it's
-   what makes LSP4IJ construct `RascalDebugAdapterDescriptor` /
+3. On the `Server` tab, at `Use an existing Adapter Server`
+   - select "Rascal Debugger" from the drop-down menu. <br>
+   it makes LSP4IJ construct `RascalDebugAdapterDescriptor` /
    `RascalBreakpointHandler` for the session (registered by this plugin via
    the `com.redhat.devtools.lsp4ij.debugAdapterServer` extension point)
-   instead of its own stock descriptor/handler. Without it, breakpoints
-   still work, but disabling/removing one while any other breakpoint is
-   active anywhere else in the project won't stop the debugger from
-   breaking at the one you just disabled -- a real bug in LSP4IJ 0.21.0's
-   `BreakpointHandlerBase.unregisterBreakpoint` (it checks the whole
-   project's breakpoint list for emptiness, not just the affected file's).
-   If that symptom shows up, this dropdown is the first thing to check --
-   IntelliJ can silently leave it on the default even if you're sure you
-   picked "Rascal Debugger" (this has happened before); confirm by grepping
-   `idea.log` for `RascalBreakpointHandler` after setting a breakpoint --
-   silence there means the setting didn't take.
-4. Set the connection to **Attach**, address `localhost`, port anything
-   (e.g. `0`) -- it gets overwritten before every launch.
-5. Apply/OK. You do not need to run this configuration yourself; the plugin
-   finds it by type and launches it for you.
+   instead of its own stock descriptor/handler.
+4. On the `Mappings` tab ("Declare file associations to allow setting
+   breakpoints"), open the **File name patterns** sub-tab, click **+**, and
+   add `*.rsc` with Language Id `rascal`. <br>
+   **Without this, breakpoints don't work at all** -- clicking the gutter
+   next to any line silently does nothing, no dot appears, no error. This
+   is because LSP4IJ's `DAPBreakpointType.canPutAt` (the check IntelliJ
+   runs before it'll even let you click a gutter) delegates to
+   `DebugAdapterManager.isDebuggableFile`, which is gated by exactly this
+   mapping -- with no mapping, IntelliJ considers *no* file debuggable, so
+   the gutter never responds anywhere. See this exact `serverMappings`
+   block already present in a working reference project's own
+   `.idea/workspace.xml` for confirmation if you want to double check
+   yours matches:
+   ```xml
+   <option name="serverMappings">
+     <list>
+       <ServerMappingSettings languageId="rascal">
+         <option name="fileNamePatterns">
+           <list><option value="*.rsc" /></list>
+         </option>
+       </ServerMappingSettings>
+     </list>
+   </option>
+   ```
+5. On the `Configuration` tab, 
+   - set `Debug Mode` to **Attach**
+   - address `localhost`
+   - port anything (e.g. `0`) -- it gets overwritten before every launch.
+6. Apply/OK, **then restart IntelliJ**. <br>
+   The Mappings change above doesn't reliably take effect for an editor
+   that's already open -- restarting is what made it actually work when
+   this was set up. You do not need to run this configuration yourself
+   afterward -- the plugin launches it automatically.
 
 ### 3c. Use it (also the verification step for 3a/3b)
 
