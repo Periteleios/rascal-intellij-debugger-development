@@ -33,15 +33,15 @@
 # which needs network access the first time any given dependency version
 # hasn't been resolved into ~/.m2 before.
 #
-# Portable the same way run-rsc-lsp.sh is: set ADEPT_BASE_ROOT to point
-# this at a project checkout other than the one this script happens to
-# live in. See that script's own comment.
+# Portable the same way run-rsc-lsp.sh is: set RASCAL_PROJECT_ROOT to
+# point this at a project checkout other than the one this script happens
+# to live in. See that script's own comment.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -n "${ADEPT_BASE_ROOT:-}" ]; then
-  PROJECT_ROOT="$(cd "$ADEPT_BASE_ROOT" && pwd)"
+if [ -n "${RASCAL_PROJECT_ROOT:-}" ]; then
+  PROJECT_ROOT="$(cd "$RASCAL_PROJECT_ROOT" && pwd)"
 else
   PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 fi

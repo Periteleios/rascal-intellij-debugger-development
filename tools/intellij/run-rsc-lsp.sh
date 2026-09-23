@@ -37,20 +37,21 @@
 # This script itself is portable -- it can be run from a location other
 # than tools/intellij/ inside this checkout (e.g. hosted alongside the
 # rascal-debugger-plugin's own public releases repo) by setting
-# ADEPT_BASE_ROOT (in this Language Server's "Environment variables" field
-# in IntelliJ, not the Command field) to an absolute path to an actual
-# adept-base checkout. There's no way around needing one somewhere on
-# disk -- this server's own compiled implementation (rascal-lsp) and this
-# project's interpreted modules both come from that checkout's Maven
-# build -- but the script no longer has to physically live inside it.
-# Unset (the default when run from within this checkout), it resolves the
-# project root from its own location exactly as before.
+# RASCAL_PROJECT_ROOT (in this Language Server's "Environment variables"
+# field in IntelliJ, not the Command field) to an absolute path to an
+# actual Maven-based Rascal project checkout. There's no way around
+# needing one somewhere on disk -- this server's own compiled
+# implementation (rascal-lsp) and that project's interpreted modules both
+# come from that checkout's Maven build -- but the script no longer has to
+# physically live inside it. Unset (the default when run from within this
+# checkout), it resolves the project root from its own location exactly
+# as before.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [ -n "${ADEPT_BASE_ROOT:-}" ]; then
-  PROJECT_ROOT="$(cd "$ADEPT_BASE_ROOT" && pwd)"
+if [ -n "${RASCAL_PROJECT_ROOT:-}" ]; then
+  PROJECT_ROOT="$(cd "$RASCAL_PROJECT_ROOT" && pwd)"
 else
   PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 fi

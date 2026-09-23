@@ -82,13 +82,11 @@ for what the script does and why the grammar needed patching.
 
 Both scripts (`run-rsc-lsp.sh`, `compute-classpath.sh`) resolve "this
 project" from their own file location by default, but that's overridable:
-set `ADEPT_BASE_ROOT` (that Language Server entry's **Environment
-variables** field, not the Command field) to an absolute path to a
-Maven-based Rascal project checkout -- despite the name, it doesn't have
-to be `adept-base` specifically, any such project works (the underlying
-language server jar has no idea which project it's serving); `adept-base`
-is just what this variable was named after and what this checkout's own
-team will actually point it at. A copy of these scripts living anywhere
+set `RASCAL_PROJECT_ROOT` (that Language Server entry's **Environment
+variables** field, not the Command field) to an absolute path to any
+Maven-based Rascal project checkout -- the underlying language server jar
+has no idea which project it's serving, so it works with any such
+project, not just this one. A copy of these scripts living anywhere
 else will use whatever it's pointed at instead of computing a location
 from their own. This is how they're mirrored, still fully functional,
 into the
