@@ -13,7 +13,7 @@ This project is a `Gradle IntelliJ Platform plugin` project.<br>
 This build needs a JDK **25+** (platform 2026.2.2's own jars are class v69; the plugin's own bytecode still targets 17).
 
 ### Option 1)
-**use Gradle tool to manage building the plugin**
+**use Gradle tool to manage building the plugin build cycle**
 - `Gradle tool window` > `gear icon` > `Gradle Settings` > `"Gradle JVM"` dropdown. 
 - Pick or download any `JDK 25+` there
 
