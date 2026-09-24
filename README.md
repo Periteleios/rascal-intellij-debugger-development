@@ -65,6 +65,17 @@ know where to look in `idea.log`:
   gutter dot). Idempotent: if a DAP configuration already exists (of any
   name), it leaves it alone rather than creating a duplicate.
 
+> Note (**Mac only**): `RascalLanguageServerFactory` doesn't inherit the
+> Project SDK above -- it re-derives its own environment by probing a real
+> login shell, which only sees a `JAVA_HOME` set in `~/.zshenv` (read by
+> every shell, login or not -- not `.zshrc`/`.zprofile` alone, and not an
+> ad-hoc terminal `export`). If `.rsc` files fail to load with
+> `JAVA_HOME environment variable is not defined correctly`, add
+> `export JAVA_HOME=~/.jdks/<your-11+-JDK>` (confirm the folder name with
+> `ls ~/.jdks/`) to `~/.zshenv`, then fully restart IntelliJ -- not just
+> reopen the project. Confirmed unnecessary on Linux: Maven there resolves
+> a JDK on its own when `JAVA_HOME` is unset.
+
 If something doesn't work, check `idea.log` (Help > Show Log in
 Files/Finder) for a `RascalTerminalSupport`/`RascalDebugPortFinder`/
 `RascalDebugAttachConfigurator`/`RascalProjectActivity`/
