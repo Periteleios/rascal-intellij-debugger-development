@@ -161,7 +161,13 @@ repository:
 
 #### Open the test file provided `src/main/rascal/Sanity.rsc`
 - Inspect [Sanity.rsc](src/main/rascal/Sanity.rsc) for syntax highlighting,diagnostics/hover/CodeLenses and <br>
-  breakpoints/stepping. Should work against whichever Maven-based Rascal project is currently open. 
+  breakpoints/stepping. Should work against whichever Maven-based Rascal project is currently open.
+
+> Note (**Mac only**): `RascalLanguageServerFactory` doesn't inherit the Project SDK above.
+> If you started the debugger and `.rsc` files fail to load and you see the message
+> `JAVA_HOME environment variable is not defined correctly`, do set
+> `export JAVA_HOME=~/.jdks/<your-11+-JDK>` to `~/.zshenv`
+> Restart IntelliJ 
 
 ### What gets auto-configured, and how
 
@@ -185,18 +191,3 @@ know where to look in `idea.log` (`Help > Show Log in Files/Finder`):
   gutter dot). Idempotent: if a DAP configuration already exists (of any
   name), it leaves it alone rather than creating a duplicate.
 
-> Note (**Mac only**): `RascalLanguageServerFactory` doesn't inherit the
-> Project SDK above.
-> If `.rsc` files fail to load, and you see the message
-> `JAVA_HOME environment variable is not defined correctly`, set
-> `export JAVA_HOME=~/.jdks/<your-11+-JDK>` to `~/.zshenv`
-> Restart IntelliJ 
-
-
-
-
-To ship a new version to the rest of the team (rather than just testing
-locally), see the release steps in
-[Periteleios/rascal-intellij-debugger-releases](https://github.com/Periteleios/rascal-intellij-debugger-releases)'s
-README -- that's the public repo hosting releases (see "Quick start"
-above for why).
