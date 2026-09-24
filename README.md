@@ -88,12 +88,12 @@ This project is a `Gradle IntelliJ Platform plugin` project.<br>
 * reinstall it in IntelliJ
   - Settings > Plugins > gear icon > Install Plugin from Disk..., then restart when prompted.
 
-This build needs a JDK **25 or higher** (platform 2026.2.2's own jars are class v69; the plugin's own bytecode still targets 17).
+This build needs a JDK **25+** (platform 2026.2.2's own jars are class v69; the plugin's own bytecode still targets 17).
 
 ### Option 1)
 **use Gradle tool to manage building the plugin**
 - `Gradle tool window` > `gear icon` > `Gradle Settings` > `"Gradle JVM"` dropdown. 
-- Pick or download any `> JDK 25` there
+- Pick or download any `JDK 25+` there
 
 
 ### Option 2)
@@ -108,7 +108,7 @@ This build needs a JDK **25 or higher** (platform 2026.2.2's own jars are class 
     /usr/libexec/java_home -V                # macOS  (JDKs registered with the system)
     ```
 
-2. If nothing `> 25` shows up, download one via 
+2. If nothing `25+` shows up, download one via 
    - `File` > `Project Structure` > `SDKs` > `+` > `Download JDK` 
    - **Amazon Corretto 26** pick that if it's offered
    <br><br>
