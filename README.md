@@ -111,6 +111,12 @@ This build needs a JDK **25+** (platform 2026.2.2's own jars are class v69; the 
 2. If nothing `25+` shows up, download one via 
    - `File` > `Project Structure` > `SDKs` > `+` > `Download JDK` 
    - **Amazon Corretto 26** pick that if it's offered
+   - downloads land under `~/.jdks/` by default -- to pin/confirm that, add this to IntelliJ's VM options (`Help` > `Edit Custom VM Options...`, or edit `idea.vmoptions` directly):
+     ```
+     -Djdk.downloader.home=~/.jdks
+     ```
+     - Mac: `~/Library/Application Support/JetBrains/IntelliJIdea2026.2/idea.vmoptions`
+     - Linux: `~/.config/JetBrains/IntelliJIdea2026.2/idea.vmoptions`
    <br><br>
 3. Set `JAVA_HOME` to the path IntelliJ actually installed it at (shown in the SDK's "JDK home path" field). <br>
    Confirm it with `ls ~/.jdks/` <br>
