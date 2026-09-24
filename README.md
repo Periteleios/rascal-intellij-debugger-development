@@ -34,8 +34,8 @@ repository:
 ### What gets auto-configured, and how
 
 Three plugin classes, each registered via an IntelliJ or LSP4IJ extension
-point -- worth knowing about if something doesn't work and you want to
-know where to look in `idea.log`:
+point are worth knowing about if something doesn't work, and you want to
+know where to look in `idea.log` (`Help > Show Log in Files/Finder`):
 
 - **`RascalTextMateBundleProvider`** registers the syntax-highlighting
   grammar (`rascal-textmate-bundle/`, shipped as a plugin resource,
@@ -59,13 +59,6 @@ know where to look in `idea.log`:
 > `JAVA_HOME environment variable is not defined correctly`, set
 > `export JAVA_HOME=~/.jdks/<your-11+-JDK>` to `~/.zshenv`
 > Restart IntelliJ 
-
-#### Debugging
-If something doesn't work, check `idea.log` (`Help > Show Log in
-Files/Finder`) for a `RascalTerminalSupport`/`RascalDebugPortFinder`/
-`RascalDebugAttachConfigurator`/`RascalProjectActivity`/
-`RascalLanguageServerFactory`/`RascalTextMateBundleProvider` entry
-
 
 ---
 
