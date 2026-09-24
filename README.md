@@ -144,9 +144,7 @@ export JAVA_HOME=~/.jdks/corretto-26.0.2.1
 
 ---
 
-
-
-# Installing and Testing the plugin
+# Installing and Running the plugin
 
 #### Prerequisite: 
 - project SDK of Java 11+ `File > Project Structure > Project > SDK`
@@ -168,9 +166,9 @@ repository:
 - Install it, restart when prompted.
 
 
-#### Open any `.rsc` file
-- [Sanity.rsc](src/main/rascal/Sanity.rsc) syntax highlighting,diagnostics/hover/CodeLenses and <br>
-  breakpoints/stepping should work against whichever Maven-based Rascal project is currently open. 
+#### Open the test file provided `src/main/rascal/Sanity.rsc`
+- Inspect [Sanity.rsc](src/main/rascal/Sanity.rsc) for syntax highlighting,diagnostics/hover/CodeLenses and <br>
+  breakpoints/stepping. Should work against whichever Maven-based Rascal project is currently open. 
 
 ### What gets auto-configured, and how
 
