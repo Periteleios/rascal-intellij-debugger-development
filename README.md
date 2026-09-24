@@ -33,7 +33,8 @@ This build needs a JDK **25+** (platform 2026.2.2's own jars are class v69; the 
 2. If nothing `25+` shows up, download one via 
    - `File` > `Project Structure` > `SDKs` > `+` > `Download JDK` 
    - **Amazon Corretto 26** pick that if it's offered
-   - downloads land under `~/.jdks/` by default -- to pin/confirm that, add this to IntelliJ's VM options (`Help` > `Edit Custom VM Options...`, or edit `idea.vmoptions` directly):
+   - downloads should land under `~/.jdks/` by default <br>
+     to pin/confirm, update IntelliJ's VM options (`Help` > `Edit Custom VM Options...`, or edit `idea.vmoptions` directly):
      ```
      -Djdk.downloader.home=~/.jdks
      ```
