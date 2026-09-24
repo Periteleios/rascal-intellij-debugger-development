@@ -7,8 +7,13 @@ syntax highlighting, editing, and debugging on its own.
 
 ## Quick start
 
-Prerequisite: build the project once so `target/classes` exists and the
-Maven jars are in your local `~/.m2` repository:
+
+Prerequisite: a Project SDK of Java 11+ (File > Project Structure > Project >
+SDK) -- IntelliJ injects this into every terminal's PATH/JAVA_HOME, and
+`rascal-maven-plugin` requires 11+ to even load (an 8 SDK fails `mvn compile`
+with `UnsupportedClassVersionError`). Then build the project once so
+`target/classes` exists and the Maven jars are in your local `~/.m2`
+repository:
 
 ```bash
 ./build.sh
@@ -34,7 +39,7 @@ jar" below, then Settings > Plugins > gear icon > **Install Plugin from
 Disk...**, restart when prompted.
 
 That's it. Open any `.rsc` file -- e.g.
-[Sanity.rsc](../../src/main/rascal/Sanity.rsc) -- and syntax highlighting,
+[Sanity.rsc](src/main/rascal/Sanity.rsc) -- and syntax highlighting,
 diagnostics/hover/CodeLenses, and breakpoints/stepping should all just
 work, against whichever Maven-based Rascal project is currently open (this
 one included, but not required -- the classpath is computed from
@@ -67,36 +72,60 @@ Files/Finder) for a `RascalTerminalSupport`/`RascalDebugPortFinder`/
 failure path logs there.
 
 `rascal-debugger-plugin/`'s own source is licensed under BSD 2-Clause --
-see its [LICENSE](rascal-debugger-plugin/LICENSE) file.
+see its [LICENSE](tools/intellij/rascal-debugger-plugin/LICENSE) file.
 
-<br>
 
-### Further Reading
+---
 
-###### Building/updating the plugin jar
+## Developing/updating/building the plugin
 
-`rascal-debugger-plugin/` is a Gradle IntelliJ Platform plugin project.<br>
-IntelliJ does not hot-reload plugins from disk.<br>
-Whenever you change its source, you need to 
-* rebuild the zip 
-* reinstall it in IntelliJ 
+This project is a `Gradle IntelliJ Platform plugin` project.<br>
+&nbsp;&nbsp;IntelliJ does not hot-reload plugins from disk.<br>
+&nbsp;&nbsp;Whenever you change its source, you need to:
+
+* rebuild the zip using the `gradle` build tool
+* create a new [release on our github repo](https://github.com/Periteleios/rascal-intellij-debugger-releases)
+* reinstall it in IntelliJ
   - Settings > Plugins > gear icon > Install Plugin from Disk..., then restart when prompted.
+
+This build needs a JDK **25 or higher** (platform 2026.2.2's own jars are class v69; the plugin's own bytecode still targets 17).
+
+**Easiest option -- use IntelliJ's Gradle tool window instead of a manual `export`:**
+
+Gradle tool window > gear icon > Gradle Settings > "Gradle JVM" dropdown. Pick or download a JDK 25+ there; it applies to every Gradle task run through the tool window, no terminal command needed.
+
+**If you prefer the command line:**
+
+1. Check what JDKs you already have -- the exact path varies by OS and by how the JDK was installed, so check more than one place:
+
+```bash
+ls ~/.jdks/                              # JetBrains-managed downloads (all platforms)
+ls /Library/Java/JavaVirtualMachines/    # macOS system location (Homebrew, vendor installers, some IntelliJ downloads)
+/usr/libexec/java_home -V                # macOS only -- lists JDKs registered with the system
+```
+
+2. If nothing 25+ shows up, download one via File > Project Structure > SDKs > + > Download JDK. **Amazon Corretto 26** is what this team standardizes on -- pick that if it's offered (any other 25+ vendor works too: OpenJDK, Temurin, etc.).
+3. Set `JAVA_HOME` to the path IntelliJ actually installed it at (shown in the SDK's "JDK home path" field). On both Mac and Linux, IntelliJ's downloader lands the folder itself under `~/.jdks/<vendor-version>` with no OS/arch suffix in the name -- so once you've downloaded the same Corretto 26 build on both machines, that top-level folder name matches. Confirm it with `ls ~/.jdks/` on each machine (patch/build strings can drift slightly if you download weeks apart) rather than assuming it matches this README verbatim. One platform wrinkle: on **Mac**, the actual JDK (`bin/java`) sits nested under `<folder>/Contents/Home/`, not at the folder's top level (Linux's tarball is flat, so `bin/java` is right at the top there). The blocks below handle this automatically -- they set `JAVA_HOME` to the bare folder, then fall through to the nested path only if it exists -- so the same block works unmodified on both OSes:
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
+export JAVA_HOME=~/.jdks/corretto-26.0.2.1
+[ -d "$JAVA_HOME/Contents/Home" ] && export JAVA_HOME="$JAVA_HOME/Contents/Home"
 ./gradlew buildPlugin
 ```
 
 Output: `build/distributions/rascal-debugger-<version>.zip` (version from
 `build.gradle.kts`).
 
+> Note: this JDK 25+ requirement is separate from the sample Rascal project's own JDK requirement (11+, for `mvn`/`rascal-maven-plugin`). Both can surface as "wrong JDK" errors, but they're two different projects with two different needs.
+
 ###### Other Gradle tasks worth knowing
 
 **See the full list of available Gradle tasks**
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
+export JAVA_HOME=~/.jdks/corretto-26.0.2.1
+[ -d "$JAVA_HOME/Contents/Home" ] && export JAVA_HOME="$JAVA_HOME/Contents/Home"
 ./gradlew tasks
 ```
 
@@ -107,7 +136,8 @@ output first.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
+export JAVA_HOME=~/.jdks/corretto-26.0.2.1
+[ -d "$JAVA_HOME/Contents/Home" ] && export JAVA_HOME="$JAVA_HOME/Contents/Home"
 ./gradlew clean
 ```
 
@@ -124,7 +154,8 @@ actually ran, not just that a configuration happened to already exist.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
+export JAVA_HOME=~/.jdks/corretto-26.0.2.1
+[ -d "$JAVA_HOME/Contents/Home" ] && export JAVA_HOME="$JAVA_HOME/Contents/Home"
 ./gradlew runIde
 ```
 
@@ -134,7 +165,8 @@ a broken state. Separate from `clean`, which doesn't touch it.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
+export JAVA_HOME=~/.jdks/corretto-26.0.2.1
+[ -d "$JAVA_HOME/Contents/Home" ] && export JAVA_HOME="$JAVA_HOME/Contents/Home"
 ./gradlew cleanSandbox
 ```
 
@@ -145,7 +177,8 @@ release.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
+export JAVA_HOME=~/.jdks/corretto-26.0.2.1
+[ -d "$JAVA_HOME/Contents/Home" ] && export JAVA_HOME="$JAVA_HOME/Contents/Home"
 ./gradlew verifyPlugin
 ```
 
@@ -155,7 +188,8 @@ fields, target platform compatibility. Worth running after editing
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
+export JAVA_HOME=~/.jdks/corretto-26.0.2.1
+[ -d "$JAVA_HOME/Contents/Home" ] && export JAVA_HOME="$JAVA_HOME/Contents/Home"
 ./gradlew verifyPluginProjectConfiguration
 ```
 
@@ -164,7 +198,8 @@ if/when tests are added under `src/test/java/`.
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
-export JAVA_HOME=~/.jdks/openjdk-26.0.2.1   # needs JDK 25+ (platform 2026.2.2's own jars are class v69); output still targets 17
+export JAVA_HOME=~/.jdks/corretto-26.0.2.1
+[ -d "$JAVA_HOME/Contents/Home" ] && export JAVA_HOME="$JAVA_HOME/Contents/Home"
 ./gradlew test
 ```
 
@@ -187,3 +222,12 @@ Notes:
   changes under any of those, you likely ran a build command from the wrong
   directory; don't commit them (one of them is a multi-MB local sandbox
   cache).
+- `gradle.properties` sets `org.gradle.java.installations.auto-detect=false`
+  -- without it, Gradle scans every JDK on the machine
+  (`/Library/Java/JavaVirtualMachines/`, `~/.jdks/`, SDKMAN, etc.) on every
+  build looking for one matching its toolchain requirement, which is slow
+  and can trigger macOS Gatekeeper "Verifying ..." popups for old JDKs it
+  hasn't touched in a while. We always set `JAVA_HOME` explicitly before
+  building, so auto-detection has nothing to add -- if a build ever
+  legitimately needs a JDK found only by auto-detection, flip this back to
+  `true` (or delete the line) rather than fighting it.

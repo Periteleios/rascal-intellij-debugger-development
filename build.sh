@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Compiles this project's Rascal sources (src/main/rascal/) and resolves
 # its Maven dependencies into ~/.m2 -- run this once before opening the
-# project in IntelliJ (see tools/intellij/README.md). Without it,
+# project in IntelliJ (see README.md). Without it,
 # target/classes stays empty and the Rascal Debugger plugin's classpath
 # computation (RascalTerminalSupport.computeDependencyClasspath) has
 # nothing to find.
