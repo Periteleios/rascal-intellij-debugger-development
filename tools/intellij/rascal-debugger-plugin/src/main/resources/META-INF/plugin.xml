@@ -64,7 +64,7 @@
           stopping at a breakpoint you just disabled). See
           RascalBreakpointHandler's own javadoc for the full story.
           Selecting "Rascal Debugger" here (not the generic/"undefined"
-          entry) is required to get this fix,see tools/intellij/README.md.
+          entry) is required to get this fix,see README.md.
         -->
         <debugAdapterServer id="rascal"
                              name="Rascal Debugger"

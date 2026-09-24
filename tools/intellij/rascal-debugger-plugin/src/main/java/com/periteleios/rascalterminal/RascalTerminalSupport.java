@@ -58,13 +58,17 @@ final class RascalTerminalSupport {
         // else that follows.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             String cp;
+            Path argFile;
             try {
                 cp = computeClasspath(project);
+                argFile = Files.createTempFile("rascal-shell-", ".args");
+                argFile.toFile().deleteOnExit();
+                Files.writeString(argFile, "-cp \"" + cp + "\"\norg.rascalmpl.shell.RascalShell\n");
             } catch (Exception e) {
                 LOG.warn("Failed to compute Rascal classpath", e);
                 notify(project, "Failed to start Rascal terminal for " + moduleName,
-                    e.getClass().getSimpleName() + ": " + e.getMessage() + " (see idea.log)",
-                    NotificationType.ERROR);
+                        e.getClass().getSimpleName() + ": " + e.getMessage() + " (see idea.log)",
+                        NotificationType.ERROR);
                 return;
             }
 
@@ -78,7 +82,7 @@ final class RascalTerminalSupport {
             // RascalShell with UnsupportedClassVersionError before it ever
             // reached ":set debugging true", with nothing surfaced anywhere
             // IntelliJ's own logging could see (it's all inside the PTY).
-            runInTerminal(widget, "exec \"" + javaExecutable() + "\" -cp \"" + cp + "\" org.rascalmpl.shell.RascalShell");
+            runInTerminal(widget, "exec \"" + javaExecutable() + "\" @\"" + argFile + "\"");
 
             // ShellTerminalWidget wires up its ProcessTtyConnector
             // asynchronously -- reading it synchronously right after

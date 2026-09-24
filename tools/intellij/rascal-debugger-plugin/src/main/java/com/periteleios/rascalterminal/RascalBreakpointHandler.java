@@ -56,7 +56,7 @@ import static com.redhat.devtools.lsp4ij.dap.DAPIJUtils.getFilePath;
  * else.
  *
  * Filed upstream: https://github.com/redhat-developer/lsp4ij (not yet
- * reported as of this writing -- see this project's tools/intellij/README.md).
+ * reported as of this writing -- see this project's README.md).
  */
 final class RascalBreakpointHandler extends DAPBreakpointHandler {
 

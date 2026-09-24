@@ -14,7 +14,7 @@
     Standalone home for the Rascal Debugger IntelliJ plugin
     (tools/intellij/rascal-debugger-plugin/) and its supporting scripts,
     plus a minimal Rascal project to develop and test them against. See
-    tools/intellij/README.md.
+    README.md.
   </description>
 
   <properties>

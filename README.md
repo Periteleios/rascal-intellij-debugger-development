@@ -39,7 +39,7 @@ jar" below, then Settings > Plugins > gear icon > **Install Plugin from
 Disk...**, restart when prompted.
 
 That's it. Open any `.rsc` file -- e.g.
-[Sanity.rsc](../../src/main/rascal/Sanity.rsc) -- and syntax highlighting,
+[Sanity.rsc](src/main/rascal/Sanity.rsc) -- and syntax highlighting,
 diagnostics/hover/CodeLenses, and breakpoints/stepping should all just
 work, against whichever Maven-based Rascal project is currently open (this
 one included, but not required -- the classpath is computed from
@@ -72,19 +72,19 @@ Files/Finder) for a `RascalTerminalSupport`/`RascalDebugPortFinder`/
 failure path logs there.
 
 `rascal-debugger-plugin/`'s own source is licensed under BSD 2-Clause --
-see its [LICENSE](rascal-debugger-plugin/LICENSE) file.
+see its [LICENSE](tools/intellij/rascal-debugger-plugin/LICENSE) file.
 
-<br>
 
-### Further Reading
+---
 
-###### Building/updating the plugin jar
+## Developing/updating/building the plugin
 
-`rascal-debugger-plugin/` is a Gradle IntelliJ Platform plugin project.<br>
-IntelliJ does not hot-reload plugins from disk.<br>
-Whenever you change its source, you need to:
+This project is a `Gradle IntelliJ Platform plugin` project.<br>
+&nbsp;&nbsp;IntelliJ does not hot-reload plugins from disk.<br>
+&nbsp;&nbsp;Whenever you change its source, you need to:
 
-* rebuild the zip
+* rebuild the zip using the `gradle` build tool
+* create a new [release on our github repo](https://github.com/Periteleios/rascal-intellij-debugger-releases)
 * reinstall it in IntelliJ
   - Settings > Plugins > gear icon > Install Plugin from Disk..., then restart when prompted.
 
