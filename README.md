@@ -216,26 +216,3 @@ locally), see the release steps in
 [Periteleios/rascal-intellij-debugger-releases](https://github.com/Periteleios/rascal-intellij-debugger-releases)'s
 README -- that's the public repo hosting releases (see "Quick start"
 above for why).
-
-Notes:
-- First build downloads a full IntelliJ IDEA IU platform artifact (matching
-  `intellijIdea("...")` in `build.gradle.kts`) to populate the compile
-  classpath -- this is slow once, cached after.
-- `settings.gradle.kts` pins the IntelliJ Platform Gradle plugin version and
-  wires up `dependencyResolutionManagement`; don't remove that in favor of a
-  plain `repositories {}` block in `build.gradle.kts` without testing --
-  this project needed it to resolve `intellijIdea(...)` at all.
-- `.intellijPlatform/`, `.gradle/`, `.idea/`, and `build/` under
-  `rascal-debugger-plugin/` are all gitignored -- if `git status` ever shows
-  changes under any of those, you likely ran a build command from the wrong
-  directory; don't commit them (one of them is a multi-MB local sandbox
-  cache).
-- `gradle.properties` sets `org.gradle.java.installations.auto-detect=false`
-  -- without it, Gradle scans every JDK on the machine
-  (`/Library/Java/JavaVirtualMachines/`, `~/.jdks/`, SDKMAN, etc.) on every
-  build looking for one matching its toolchain requirement, which is slow
-  and can trigger macOS Gatekeeper "Verifying ..." popups for old JDKs it
-  hasn't touched in a while. We always set `JAVA_HOME` explicitly before
-  building, so auto-detection has nothing to add -- if a build ever
-  legitimately needs a JDK found only by auto-detection, flip this back to
-  `true` (or delete the line) rather than fighting it.
