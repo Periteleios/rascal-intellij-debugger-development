@@ -1,11 +1,3 @@
-# IntelliJ setup for Rascal (highlighting + editing + debugging)
-
-This directory makes Rascal (`.rsc`) files readable, editable, and
-debuggable in IntelliJ IDEA. As of `rascal-debugger-plugin` 0.1.0,
-**installing the plugin is all you need to do** -- it auto-configures
-syntax highlighting, editing, and debugging on its own.
-
----
 
 # Developing | updating | building the plugin
  
