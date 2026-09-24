@@ -5,45 +5,31 @@ debuggable in IntelliJ IDEA. As of `rascal-debugger-plugin` 0.1.0,
 **installing the plugin is all you need to do** -- it auto-configures
 syntax highlighting, editing, and debugging on its own.
 
-## Quick start
+# Quick start
 
-
-Prerequisite: a Project SDK of Java 11+ (File > Project Structure > Project >
-SDK) -- IntelliJ injects this into every terminal's PATH/JAVA_HOME, and
-`rascal-maven-plugin` requires 11+ to even load (an 8 SDK fails `mvn compile`
-with `UnsupportedClassVersionError`). Then build the project once so
-`target/classes` exists and the Maven jars are in your local `~/.m2`
+#### Prerequisite: 
+- project SDK of Java 11+ `File > Project Structure > Project > SDK`
+- build the project once so `target/classes` exists and the Maven jars are in your local `~/.m2`
 repository:
 
-```bash
-./build.sh
-```
+    ```bash
+    ./build.sh
+    ```
 
-Then install the plugin: Settings/Preferences > Plugins > gear icon (⚙) >
-**Manage Plugin Repositories...** > **+** > add:
+#### Install the plugin:
+- `Settings/Preferences > Plugins > gear icon (⚙) > Manage Plugin Repositories... > + >` <br>
+   
+    ```
+    https://raw.githubusercontent.com/Periteleios/rascal-intellij-debugger-releases/main/updatePlugins.xml
+    ```
 
-```
-https://raw.githubusercontent.com/Periteleios/rascal-intellij-debugger-releases/main/updatePlugins.xml
-```
+- Go to the **Marketplace** tab and search "Rascal Debugger"
+- Install it, restart when prompted.
 
-Apply, then go to the **Marketplace** tab and search "Rascal Debugger"
-(older releases may still show as "Rascal Terminal Commands") -- it should
-show up (possibly labeled as coming from a custom repository rather than
-the usual JetBrains vendor listing). Install it, restart when prompted.
-Future releases show up as normal plugin updates from then on -- no manual
-reinstalling.
 
-If you're actively developing the plugin itself rather than just using it,
-build and install it locally instead -- see "Building/updating the plugin
-jar" below, then Settings > Plugins > gear icon > **Install Plugin from
-Disk...**, restart when prompted.
-
-That's it. Open any `.rsc` file -- e.g.
-[Sanity.rsc](src/main/rascal/Sanity.rsc) -- and syntax highlighting,
-diagnostics/hover/CodeLenses, and breakpoints/stepping should all just
-work, against whichever Maven-based Rascal project is currently open (this
-one included, but not required -- the classpath is computed from
-whatever project is actually open, not hardcoded to this checkout).
+#### Open any `.rsc` file
+- [Sanity.rsc](src/main/rascal/Sanity.rsc) syntax highlighting,diagnostics/hover/CodeLenses and <br>
+  breakpoints/stepping should work against whichever Maven-based Rascal project is currently open. 
 
 ### What gets auto-configured, and how
 
@@ -55,9 +41,11 @@ know where to look in `idea.log`:
   grammar (`rascal-textmate-bundle/`, shipped as a plugin resource,
   extracted once to a real directory on first use -- TextMate bundles need
   an actual filesystem path, not a jar resource).
+  <br><br>
 - **`RascalLanguageServerFactory`** registers the `.rsc` Language Server,
   computing its classpath from whichever project is currently open (the
   same computation "Import"/"Run in new Rascal terminal" already used).
+  <br><br>
 - **`RascalProjectActivity`** auto-creates the "Rascal Attach" DAP
   Run/Debug configuration on project open, including the exact
   `*.rsc -> rascal` Mappings-tab entry that's easy to miss by hand and,
@@ -66,30 +54,23 @@ know where to look in `idea.log`:
   name), it leaves it alone rather than creating a duplicate.
 
 > Note (**Mac only**): `RascalLanguageServerFactory` doesn't inherit the
-> Project SDK above -- it re-derives its own environment by probing a real
-> login shell, which only sees a `JAVA_HOME` set in `~/.zshenv` (read by
-> every shell, login or not -- not `.zshrc`/`.zprofile` alone, and not an
-> ad-hoc terminal `export`). If `.rsc` files fail to load with
-> `JAVA_HOME environment variable is not defined correctly`, add
-> `export JAVA_HOME=~/.jdks/<your-11+-JDK>` (confirm the folder name with
-> `ls ~/.jdks/`) to `~/.zshenv`, then fully restart IntelliJ -- not just
-> reopen the project. Confirmed unnecessary on Linux: Maven there resolves
-> a JDK on its own when `JAVA_HOME` is unset.
+> Project SDK above.
+> If `.rsc` files fail to load, and you see the message
+> `JAVA_HOME environment variable is not defined correctly`, set
+> `export JAVA_HOME=~/.jdks/<your-11+-JDK>` to `~/.zshenv`
+> Restart IntelliJ 
 
-If something doesn't work, check `idea.log` (Help > Show Log in
-Files/Finder) for a `RascalTerminalSupport`/`RascalDebugPortFinder`/
+#### Debugging
+If something doesn't work, check `idea.log` (`Help > Show Log in
+Files/Finder`) for a `RascalTerminalSupport`/`RascalDebugPortFinder`/
 `RascalDebugAttachConfigurator`/`RascalProjectActivity`/
-`RascalLanguageServerFactory`/`RascalTextMateBundleProvider` entry -- every
-failure path logs there.
-
-`rascal-debugger-plugin/`'s own source is licensed under BSD 2-Clause --
-see its [LICENSE](tools/intellij/rascal-debugger-plugin/LICENSE) file.
+`RascalLanguageServerFactory`/`RascalTextMateBundleProvider` entry
 
 
 ---
 
-## Developing/updating/building the plugin
-
+# Developing | updating | building the plugin
+ 
 This project is a `Gradle IntelliJ Platform plugin` project.<br>
 &nbsp;&nbsp;IntelliJ does not hot-reload plugins from disk.<br>
 &nbsp;&nbsp;Whenever you change its source, you need to:
@@ -108,7 +89,7 @@ This build needs a JDK **25+** (platform 2026.2.2's own jars are class v69; the 
 
 
 ### Option 2)
-**command line**
+**use command line**
 
 1. Check what JDKs you already have
    - the exact path varies by OS and by how the JDK was installed, <br>so check more than one place:
@@ -137,12 +118,9 @@ This build needs a JDK **25+** (platform 2026.2.2's own jars are class v69; the 
 
 ---
 
-###### Gradle Tasks
+###### Useful Gradle Tasks
 
-**Clean build output** -- deletes `build/` entirely: the compiled classes,
-the instrumented bytecode, and the zip from `buildPlugin`. Use this if a
-stale build is ever in doubt; `buildPlugin` alone does not wipe prior
-output first.
+**Clean**
 
 ```bash
 cd tools/intellij/rascal-debugger-plugin
@@ -162,8 +140,6 @@ export JAVA_HOME=~/.jdks/corretto-26.0.2.1
 
 Output: `build/distributions/rascal-debugger-<version>.zip` (version from
 `build.gradle.kts`).
-
-> Note: this JDK 25+ requirement is separate from the sample Rascal project's own JDK requirement (11+, for `mvn`/`rascal-maven-plugin`). Both can surface as "wrong JDK" errors, but they're two different projects with two different needs.
 
 ###### Other Gradle tasks
 
